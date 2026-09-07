@@ -1,0 +1,90 @@
+---
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Bhavya Computer Classes - Attendance Portal',
+  description = 'Smart Attendance & Academic Management System for Bhavya Computer Classes',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50 text-slate-900 antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="flex flex-col min-h-full font-sans bg-slate-50 text-slate-900 selection:bg-brand-500 selection:text-white relative">
+    <slot />
+
+    <!-- Global Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+    
+    <script>
+      // Global Toast Notification Helper
+      (window as any).showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration: number = 3500) => {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto flex items-center gap-3 p-4 rounded-2xl shadow-xl backdrop-blur-md border toast-enter transition-all text-xs font-semibold';
+        
+        let icon = 'ℹ️';
+        let bgStyle = 'bg-slate-900/90 text-white border-white/10';
+        if (type === 'success') {
+          icon = '✓';
+          bgStyle = 'bg-emerald-950/90 text-emerald-100 border-emerald-500/30';
+        } else if (type === 'error') {
+          icon = '✕';
+          bgStyle = 'bg-rose-950/90 text-rose-100 border-rose-500/30';
+        } else if (type === 'warning') {
+          icon = '⚠️';
+          bgStyle = 'bg-amber-950/90 text-amber-100 border-amber-500/30';
+        }
+
+        toast.className += ` ${bgStyle}`;
+        toast.innerHTML = `
+          <span class="w-6 h-6 rounded-full flex items-center justify-center bg-white/10 flex-shrink-0 text-sm font-bold">${icon}</span>
+          <span class="flex-1 leading-snug">${message}</span>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.remove('toast-enter');
+          toast.classList.add('toast-exit');
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
+      };
+
+      // Register Service Worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.log('Service Worker registration failed:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
+

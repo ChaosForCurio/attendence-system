@@ -1,0 +1,148 @@
+---
+import StudentLayout from '@/layouts/StudentLayout.astro';
+import { getSessionFromRequest } from '@/lib/auth';
+import { Clock, MapPin, User } from 'lucide-astro';
+
+
+const session = getSessionFromRequest(Astro.request);
+if (!session || session.role !== 'student') {
+  return Astro.redirect('/login');
+}
+---
+
+<StudentLayout title="Class Schedule - Bhavya Computer Classes">
+  <div class="space-y-4">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Weekly Timetable</h2>
+        <p class="text-xs font-medium text-slate-500">Your registered batch curriculum</p>
+      </div>
+      <span class="text-xs font-bold text-brand-600 bg-brand-50 border border-brand-200/80 px-3 py-1.5 rounded-xl shadow-sm">
+        Batch BCA 2A
+      </span>
+    </div>
+
+    <!-- Weekday Filter Tabs -->
+    <div class="grid grid-cols-5 gap-1 text-center bg-slate-200/80 p-1 rounded-2xl text-xs font-bold">
+      <button class="day-tab py-2 rounded-xl bg-white text-brand-600 shadow-sm transition" data-day="1">Mon</button>
+      <button class="day-tab py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/50 transition" data-day="2">Tue</button>
+      <button class="day-tab py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/50 transition" data-day="3">Wed</button>
+      <button class="day-tab py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/50 transition" data-day="4">Thu</button>
+      <button class="day-tab py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/50 transition" data-day="5">Fri</button>
+    </div>
+
+    <!-- Schedule Items Grid -->
+    <div id="schedule-container" class="space-y-3">
+      
+      <!-- Period 1 -->
+      <div class="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3 hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-xl">
+            <Clock class="w-3.5 h-3.5" />
+            <span>09:00 AM – 10:00 AM</span>
+          </div>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Current Period
+          </span>
+        </div>
+        
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 leading-tight">Web Development & Programming</h3>
+          <p class="text-xs text-slate-500 mt-1 flex items-center gap-3">
+            <span class="flex items-center gap-1">
+              <User class="w-3.5 h-3.5 text-slate-400" />
+              Mr. Sharma
+            </span>
+            <span>•</span>
+            <span class="flex items-center gap-1">
+              <MapPin class="w-3.5 h-3.5 text-slate-400" />
+              Computer Lab 1
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Period 2 -->
+      <div class="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3 hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-xl">
+            <Clock class="w-3.5 h-3.5" />
+            <span>10:00 AM – 11:00 AM</span>
+          </div>
+          <span class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+            <MapPin class="w-3.5 h-3.5 text-slate-400" />
+            Room 204
+          </span>
+        </div>
+        
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 leading-tight">Discrete Mathematics</h3>
+          <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <User class="w-3.5 h-3.5 text-slate-400" />
+            Faculty: Mr. Sharma
+          </p>
+        </div>
+      </div>
+
+      <!-- Period 3 -->
+      <div class="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3 hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-xl">
+            <Clock class="w-3.5 h-3.5" />
+            <span>11:00 AM – 12:00 PM</span>
+          </div>
+          <span class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+            <MapPin class="w-3.5 h-3.5 text-slate-400" />
+            Computer Lab 2
+          </span>
+        </div>
+        
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 leading-tight">Database Systems & SQL</h3>
+          <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <User class="w-3.5 h-3.5 text-slate-400" />
+            Faculty: Mr. Sharma
+          </p>
+        </div>
+      </div>
+
+      <!-- Period 4 -->
+      <div class="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3 hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-xl">
+            <Clock class="w-3.5 h-3.5" />
+            <span>12:00 PM – 01:00 PM</span>
+          </div>
+          <span class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+            <MapPin class="w-3.5 h-3.5 text-slate-400" />
+            Room 204
+          </span>
+        </div>
+        
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 leading-tight">Technical Communication & English</h3>
+          <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <User class="w-3.5 h-3.5 text-slate-400" />
+            Faculty: Mr. Sharma
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.day-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.day-tab').forEach((t) => {
+          t.className = 'day-tab py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/50 transition';
+        });
+        tab.className = 'day-tab py-2 rounded-xl bg-white text-brand-600 shadow-sm font-bold transition';
+      });
+    });
+  </script>
+</StudentLayout>
+

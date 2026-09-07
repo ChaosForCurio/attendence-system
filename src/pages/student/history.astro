@@ -1,0 +1,217 @@
+---
+import StudentLayout from '@/layouts/StudentLayout.astro';
+import { getSessionFromRequest } from '@/lib/auth';
+import { Clock, Search, Calendar } from 'lucide-astro';
+
+
+const session = getSessionFromRequest(Astro.request);
+if (!session || session.role !== 'student') {
+  return Astro.redirect('/login');
+}
+---
+
+<StudentLayout title="Attendance History - Bhavya Computer Classes">
+  <div class="space-y-4">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Attendance Log</h2>
+        <p class="text-xs font-medium text-slate-500">History of your verified class attendances</p>
+      </div>
+      <div class="p-2 rounded-2xl bg-brand-50 text-brand-600">
+        <Clock class="w-5 h-5" />
+      </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="space-y-2.5">
+      <!-- Search Input -->
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+          <Search class="w-4 h-4" />
+        </div>
+        <input
+          type="text"
+          id="history-search"
+          placeholder="Filter by subject or teacher..."
+          class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-slate-200/80 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium shadow-sm transition"
+        />
+      </div>
+
+      <!-- Filter Pills -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold no-scrollbar">
+        <button class="filter-pill px-3 py-1.5 rounded-xl bg-brand-600 text-white shadow-sm transition active:scale-95 whitespace-nowrap" data-filter="all">
+          All
+        </button>
+        <button class="filter-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition active:scale-95 whitespace-nowrap" data-filter="present">
+          ✓ Present
+        </button>
+        <button class="filter-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition active:scale-95 whitespace-nowrap" data-filter="late">
+          ⚠ Late
+        </button>
+        <button class="filter-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition active:scale-95 whitespace-nowrap" data-filter="absent">
+          ✕ Absent
+        </button>
+        <button class="filter-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition active:scale-95 whitespace-nowrap" data-filter="excused">
+          ℹ Excused
+        </button>
+      </div>
+    </div>
+
+    <!-- Attendance Log Items Container -->
+    <div id="history-container" class="space-y-2.5">
+      
+      <!-- Record 1 -->
+      <div class="history-item p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition" data-status="present" data-subject="web development">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Calendar class="w-3 h-3" />
+              7 September 2026
+            </span>
+            <span class="text-[10px] text-slate-400 font-medium">09:04 AM</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 leading-tight">Web Development & Programming</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Mr. Sharma • 1-Tap Mobile Verification</p>
+        </div>
+        <span class="badge-present">
+          ✓ Present
+        </span>
+      </div>
+
+      <!-- Record 2 -->
+      <div class="history-item p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition" data-status="present" data-subject="web development">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Calendar class="w-3 h-3" />
+              6 September 2026
+            </span>
+            <span class="text-[10px] text-slate-400 font-medium">09:02 AM</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 leading-tight">Web Development & Programming</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Mr. Sharma • 1-Tap Mobile Verification</p>
+        </div>
+        <span class="badge-present">
+          ✓ Present
+        </span>
+      </div>
+
+      <!-- Record 3 -->
+      <div class="history-item p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition" data-status="late" data-subject="database systems">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Calendar class="w-3 h-3" />
+              6 September 2026
+            </span>
+            <span class="text-[10px] text-slate-400 font-medium">11:18 AM</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 leading-tight">Database Systems & SQL</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Mr. Sharma • QR Code Scan</p>
+        </div>
+        <span class="badge-late">
+          ⚠ Late
+        </span>
+      </div>
+
+      <!-- Record 4 -->
+      <div class="history-item p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition" data-status="absent" data-subject="mathematics">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Calendar class="w-3 h-3" />
+              5 September 2026
+            </span>
+            <span class="text-[10px] text-slate-400 font-medium">10:00 AM</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 leading-tight">Discrete Mathematics</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Mr. Sharma • Unexcused Absence</p>
+        </div>
+        <span class="badge-absent">
+          ✕ Absent
+        </span>
+      </div>
+
+      <!-- Record 5 -->
+      <div class="history-item p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition" data-status="excused" data-subject="english">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Calendar class="w-3 h-3" />
+              4 September 2026
+            </span>
+            <span class="text-[10px] text-slate-400 font-medium">12:00 PM</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 leading-tight">Technical Communication & English</h3>
+          <p class="text-[11px] text-slate-500 font-medium">Mr. Sharma • Medical Exemption</p>
+        </div>
+        <span class="badge-excused">
+          ℹ Excused
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Empty search result state -->
+    <div id="no-results" class="hidden p-8 rounded-3xl bg-white border border-slate-200 text-center space-y-2">
+      <p class="text-xs font-bold text-slate-600">No attendance records found</p>
+      <p class="text-[11px] text-slate-400">Try adjusting your search query or filter selection</p>
+    </div>
+
+  </div>
+
+  <script>
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    const filterPills = document.querySelectorAll('.filter-pill');
+    const historyItems = document.querySelectorAll('.history-item');
+    const searchInput = document.getElementById('history-search') as HTMLInputElement;
+    const noResults = document.getElementById('no-results')!;
+
+    function applyFilters() {
+      let visibleCount = 0;
+      historyItems.forEach((item) => {
+        const el = item as HTMLElement;
+        const status = el.getAttribute('data-status') || '';
+        const subject = el.getAttribute('data-subject') || '';
+        const textContent = el.textContent?.toLowerCase() || '';
+
+        const matchesStatus = activeFilter === 'all' || status === activeFilter;
+        const matchesSearch = !searchQuery || textContent.includes(searchQuery.toLowerCase());
+
+        if (matchesStatus && matchesSearch) {
+          el.style.display = 'flex';
+          visibleCount++;
+        } else {
+          el.style.display = 'none';
+        }
+      });
+
+      if (visibleCount === 0) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+      }
+    }
+
+    filterPills.forEach((pill) => {
+      pill.addEventListener('click', () => {
+        filterPills.forEach((p) => {
+          p.className = 'filter-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition active:scale-95 whitespace-nowrap';
+        });
+        pill.className = 'filter-pill px-3 py-1.5 rounded-xl bg-brand-600 text-white shadow-sm transition active:scale-95 whitespace-nowrap';
+        activeFilter = pill.getAttribute('data-filter') || 'all';
+        applyFilters();
+      });
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+      searchQuery = (e.target as HTMLInputElement).value.trim();
+      applyFilters();
+    });
+  </script>
+</StudentLayout>
+

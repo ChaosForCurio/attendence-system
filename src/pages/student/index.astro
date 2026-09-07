@@ -1,0 +1,401 @@
+---
+import StudentLayout from '@/layouts/StudentLayout.astro';
+import { getSessionFromRequest } from '@/lib/auth';
+import {
+  Sparkles,
+  Clock,
+  AlertTriangle,
+  Calendar,
+  ShieldCheck,
+  TrendingUp,
+} from 'lucide-astro';
+
+
+const session = getSessionFromRequest(Astro.request);
+if (!session || session.role !== 'student') {
+  return Astro.redirect('/login');
+}
+
+const todayFormatted = new Date().toLocaleDateString('en-US', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<StudentLayout title="Student Attendance - Bhavya Computer Classes">
+  <div class="space-y-5">
+    
+    <!-- Greeting & Header Bar -->
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="flex items-center gap-1.5 text-xs text-brand-600 font-bold uppercase tracking-wider mb-0.5">
+          <Sparkles class="w-3.5 h-3.5" />
+          <span>Student Portal</span>
+        </div>
+        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">
+          Hello, {session.name.split(' ')[0]} 👋
+        </h2>
+        <p class="text-xs font-medium text-slate-500 flex items-center gap-1">
+          <Calendar class="w-3 h-3 text-slate-400" />
+          <span>{todayFormatted}</span>
+        </p>
+      </div>
+
+      <div class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>PWA Ready</span>
+      </div>
+    </div>
+
+    <!-- Low Attendance Warning Alert Banner -->
+    <div id="warning-banner" class="hidden p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 shadow-sm flex items-start gap-3 transition-all">
+      <div class="p-2 rounded-xl bg-amber-500/20 text-amber-700 flex-shrink-0">
+        <AlertTriangle class="w-5 h-5" />
+      </div>
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-amber-800">Attendance Warning</h3>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200/60 text-amber-900">Below 75%</span>
+        </div>
+        <p class="text-xs text-amber-900/90 leading-relaxed font-medium" id="warning-message">
+          Your overall attendance is below the mandatory 75% threshold. Please attend upcoming sessions to avoid academic review.
+        </p>
+      </div>
+    </div>
+
+    <!-- CURRENT CLASS HERO CARD & 1-TAP BUTTON -->
+    <div class="relative bg-gradient-to-br from-brand-600 via-indigo-600 to-indigo-800 rounded-3xl p-6 text-white shadow-xl shadow-brand-600/25 border border-white/20 overflow-hidden">
+      <!-- Glow decoration -->
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-brand-400/20 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex items-center justify-between mb-4">
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-[10px] font-extrabold uppercase tracking-wider">
+          <span id="session-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>LIVE SESSION</span>
+        </div>
+        <div id="session-time-pill" class="flex items-center gap-1 text-xs font-semibold text-brand-100 bg-black/20 px-2.5 py-1 rounded-xl">
+          <Clock class="w-3.5 h-3.5 text-brand-200" />
+          <span id="session-time">Checking...</span>
+        </div>
+      </div>
+
+      <div class="relative z-10 space-y-1.5 mb-6">
+        <h3 id="class-title" class="text-2xl font-black text-white leading-tight tracking-tight">
+          Checking class schedule...
+        </h3>
+        <p id="class-faculty" class="text-xs text-brand-100 font-medium flex items-center gap-2">
+          <span>Loading session details...</span>
+        </p>
+      </div>
+
+      <!-- THE 1-TAP MARK PRESENT HERO BUTTON -->
+      <div id="hero-button-container" class="relative z-10 space-y-2">
+        <button
+          id="mark-present-btn"
+          disabled
+          class="w-full py-4 px-6 rounded-2xl bg-white text-brand-950 font-black text-base shadow-lg hover:bg-brand-50 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        >
+          <span id="btn-icon" class="text-xl">✓</span>
+          <span id="btn-label">MARK PRESENT</span>
+        </button>
+
+        <p id="feedback-text" class="text-[11px] text-center text-brand-100 font-medium flex items-center justify-center gap-1">
+          <ShieldCheck class="w-3.5 h-3.5 text-brand-200 inline" />
+          <span id="feedback-message">Instantaneous server verification</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE OVERVIEW SUMMARY CARD (WITH RADIAL PROGRESS) -->
+    <div class="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="p-2 rounded-xl bg-brand-50 text-brand-600">
+            <TrendingUp class="w-4 h-4" />
+          </div>
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Overall Attendance</h3>
+            <span id="attendance-health-badge" class="inline-block text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-0.5">
+              Calculating...
+            </span>
+          </div>
+        </div>
+
+        <!-- Circular SVG Progress Ring -->
+        <div class="relative flex items-center justify-center w-16 h-16">
+          <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              stroke="currentColor"
+              stroke-width="8"
+              class="text-slate-100"
+              fill="transparent"
+            />
+            <circle
+              id="progress-circle"
+              cx="50"
+              cy="50"
+              r="40"
+              stroke="currentColor"
+              stroke-width="8"
+              stroke-linecap="round"
+              stroke-dasharray="251.2"
+              stroke-dashoffset="251.2"
+              class="text-brand-600 transition-all duration-1000 ease-out"
+              fill="transparent"
+            />
+          </svg>
+          <span id="overall-percentage" class="absolute text-sm font-black text-slate-900">--%</span>
+        </div>
+      </div>
+
+      <!-- Stats Grid Breakdown -->
+      <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-100 text-center">
+        <div class="p-2.5 rounded-2xl bg-emerald-50/70 border border-emerald-100">
+          <span id="stat-present" class="block text-base font-extrabold text-emerald-700">0</span>
+          <span class="text-[10px] text-emerald-800 font-semibold">Present</span>
+        </div>
+        <div class="p-2.5 rounded-2xl bg-amber-50/70 border border-amber-100">
+          <span id="stat-late" class="block text-base font-extrabold text-amber-700">0</span>
+          <span class="text-[10px] text-amber-800 font-semibold">Late</span>
+        </div>
+        <div class="p-2.5 rounded-2xl bg-rose-50/70 border border-rose-100">
+          <span id="stat-absent" class="block text-base font-extrabold text-rose-700">0</span>
+          <span class="text-[10px] text-rose-800 font-semibold">Absent</span>
+        </div>
+        <div class="p-2.5 rounded-2xl bg-sky-50/70 border border-sky-100">
+          <span id="stat-excused" class="block text-base font-extrabold text-sky-700">0</span>
+          <span class="text-[10px] text-sky-800 font-semibold">Excused</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODAY'S SCHEDULE TIMELINE -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between px-1">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <Calendar class="w-3.5 h-3.5 text-slate-400" />
+          <span>Today's Schedule</span>
+        </h3>
+        <a href="/student/schedule" class="text-xs font-bold text-brand-600 hover:text-brand-700 transition">
+          View full timetable →
+        </a>
+      </div>
+      
+      <div id="schedule-timeline" class="space-y-2.5">
+        <div class="p-5 rounded-2xl bg-white border border-slate-200/80 text-center text-xs text-slate-400">
+          Loading schedule timeline...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    import confetti from 'canvas-confetti';
+
+    let activeSessionId: string | null = null;
+    let isSubmitting = false;
+
+    // Trigger celebratory confetti burst
+    function launchConfetti() {
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.65 },
+          colors: ['#4f46e5', '#10b981', '#fbbf24', '#6366f1'],
+        });
+      } catch (e) {}
+    }
+
+    // Animate SVG circular progress
+    function updateProgressRing(percent: number) {
+      const circle = document.getElementById('progress-circle') as SVGCircleElement | null;
+      if (!circle) return;
+
+      const circumference = 251.2; // 2 * pi * 40
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDashoffset = String(Math.max(0, offset));
+
+      // Color coding
+      circle.classList.remove('text-brand-600', 'text-emerald-500', 'text-amber-500', 'text-rose-500');
+      const healthBadge = document.getElementById('attendance-health-badge')!;
+      
+      if (percent >= 85) {
+        circle.classList.add('text-emerald-500');
+        healthBadge.className = 'inline-block text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full mt-0.5';
+        healthBadge.textContent = '🌟 Excellent Status (≥85%)';
+      } else if (percent >= 75) {
+        circle.classList.add('text-brand-600');
+        healthBadge.className = 'inline-block text-[10px] font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full mt-0.5';
+        healthBadge.textContent = '✓ Safe Status (≥75%)';
+      } else {
+        circle.classList.add('text-rose-500');
+        healthBadge.className = 'inline-block text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full mt-0.5';
+        healthBadge.textContent = '⚠ Below Required 75%';
+      }
+    }
+
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/api/student/dashboard');
+        if (!res.ok) return;
+
+        const data = await res.json();
+        
+        // 1. Stats Update & Circular Progress
+        const stats = data.stats;
+        document.getElementById('overall-percentage')!.textContent = `${stats.percentage}%`;
+        document.getElementById('stat-present')!.textContent = stats.present;
+        document.getElementById('stat-late')!.textContent = stats.late;
+        document.getElementById('stat-absent')!.textContent = stats.absent;
+        document.getElementById('stat-excused')!.textContent = stats.excused;
+
+        updateProgressRing(Number(stats.percentage) || 0);
+
+        // Warning banner
+        const warningBanner = document.getElementById('warning-banner')!;
+        if (stats.isLowAttendance) {
+          warningBanner.classList.remove('hidden');
+        } else {
+          warningBanner.classList.add('hidden');
+        }
+
+        // 2. Current Active Session Hero
+        const currentSession = data.currentSession;
+        const markBtn = document.getElementById('mark-present-btn') as HTMLButtonElement;
+        const btnLabel = document.getElementById('btn-label')!;
+        const btnIcon = document.getElementById('btn-icon')!;
+        const classTitle = document.getElementById('class-title')!;
+        const classFaculty = document.getElementById('class-faculty')!;
+        const sessionTime = document.getElementById('session-time')!;
+        const feedbackMessage = document.getElementById('feedback-message')!;
+        const sessionDot = document.getElementById('session-dot')!;
+
+        if (currentSession) {
+          activeSessionId = currentSession.sessionId;
+          classTitle.textContent = currentSession.subjectName;
+          classFaculty.innerHTML = `<span>📍 ${currentSession.room}</span> <span>•</span> <span>👨‍🏫 ${currentSession.teacherName}</span>`;
+          sessionTime.textContent = `${currentSession.startTime} – ${currentSession.endTime}`;
+          sessionDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+
+          if (currentSession.isAlreadyMarked) {
+            markBtn.disabled = true;
+            markBtn.className = 'w-full py-4 px-6 rounded-2xl bg-emerald-500 text-white font-black text-base shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-3 cursor-default';
+            btnIcon.textContent = '✓';
+            btnLabel.textContent = `ATTENDANCE MARKED (${currentSession.markedRecord.status.toUpperCase()})`;
+            feedbackMessage.textContent = `Verified and recorded at ${new Date(currentSession.markedRecord.markedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+          } else {
+            markBtn.disabled = false;
+            markBtn.className = 'w-full py-4 px-6 rounded-2xl bg-white text-brand-950 font-black text-base shadow-lg hover:bg-brand-50 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer animate-pulse-subtle';
+            btnIcon.textContent = '✓';
+            btnLabel.textContent = 'MARK PRESENT';
+            feedbackMessage.textContent = 'Tap to record attendance on server instantly';
+          }
+        } else {
+          classTitle.textContent = 'No Active Class Session';
+          classFaculty.innerHTML = `<span>No active sessions right now</span>`;
+          sessionTime.textContent = 'Standby';
+          sessionDot.className = 'w-2 h-2 rounded-full bg-slate-400';
+          markBtn.disabled = true;
+          markBtn.className = 'w-full py-4 px-6 rounded-2xl bg-white/20 text-white/60 font-black text-base cursor-not-allowed flex items-center justify-center gap-3';
+          btnLabel.textContent = 'NO ACTIVE SESSION';
+          feedbackMessage.textContent = 'Sessions will appear automatically when faculty launches them';
+        }
+
+        // 3. Schedule Timeline render
+        const timelineContainer = document.getElementById('schedule-timeline')!;
+        if (data.todaySchedules && data.todaySchedules.length > 0) {
+          timelineContainer.innerHTML = data.todaySchedules.map((sch: any) => `
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm hover:shadow-md transition">
+              <div class="flex items-center gap-3">
+                <div class="text-xs font-bold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-xl border border-brand-100 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                  ${sch.startTime}
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-slate-900">${sch.subjectName}</h4>
+                  <p class="text-[11px] text-slate-500 font-medium">${sch.room} • ${sch.teacherName}</p>
+                </div>
+              </div>
+              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                Scheduled
+              </span>
+            </div>
+          `).join('');
+        } else {
+          timelineContainer.innerHTML = '<div class="p-4 rounded-2xl bg-white border border-slate-200 text-center text-xs text-slate-500 font-medium">No classes scheduled for today.</div>';
+        }
+
+      } catch (err) {
+        console.error('Dashboard load failed:', err);
+      }
+    }
+
+    // 1-TAP MARK PRESENT CLICK HANDLER
+    document.getElementById('mark-present-btn')?.addEventListener('click', async () => {
+      if (!activeSessionId || isSubmitting) return;
+
+      isSubmitting = true;
+      const markBtn = document.getElementById('mark-present-btn') as HTMLButtonElement;
+      const btnLabel = document.getElementById('btn-label')!;
+      const btnIcon = document.getElementById('btn-icon')!;
+      const feedbackMessage = document.getElementById('feedback-message')!;
+
+      markBtn.disabled = true;
+      btnLabel.textContent = 'VERIFYING...';
+      btnIcon.textContent = '⏳';
+
+      try {
+        const res = await fetch('/api/attendance/mark', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: activeSessionId,
+            method: 'button',
+          }),
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          // Trigger Confetti explosion
+          launchConfetti();
+
+          markBtn.className = 'w-full py-4 px-6 rounded-2xl bg-emerald-500 text-white font-black text-base shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-3 transition-all duration-300';
+          btnIcon.textContent = '✓';
+          btnLabel.textContent = 'ATTENDANCE MARKED!';
+          feedbackMessage.textContent = result.message || '✓ Verified and logged on server';
+
+          (window as any).showToast?.('Attendance recorded successfully! 🎉', 'success');
+
+          setTimeout(() => {
+            loadDashboard();
+            isSubmitting = false;
+          }, 1200);
+        } else {
+          (window as any).showToast?.(result.error || 'Could not mark attendance.', 'error');
+          markBtn.disabled = false;
+          btnLabel.textContent = 'MARK PRESENT';
+          btnIcon.textContent = '✓';
+          isSubmitting = false;
+        }
+      } catch (err) {
+        (window as any).showToast?.('Network connection error. Please try again.', 'error');
+        markBtn.disabled = false;
+        btnLabel.textContent = 'MARK PRESENT';
+        btnIcon.textContent = '✓';
+        isSubmitting = false;
+      }
+    });
+
+    loadDashboard();
+  </script>
+</StudentLayout>
+

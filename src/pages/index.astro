@@ -1,0 +1,33 @@
+---
+import { getSessionFromRequest } from '@/lib/auth';
+
+const session = getSessionFromRequest(Astro.request);
+
+let target = '/login';
+if (session) {
+  if (session.role === 'student') target = '/student';
+  else if (session.role === 'teacher') target = '/teacher';
+  else if (session.role === 'admin') target = '/admin';
+}
+
+return Astro.redirect(target);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <title>Redirecting...</title>
+    <script define:vars={{ target }}>
+      window.location.href = target;
+    </script>
+  </head>
+  <body class="bg-slate-950 text-white flex items-center justify-center min-h-screen font-sans">
+    <div class="text-center space-y-2">
+      <p class="text-sm font-semibold">Redirecting to attendance portal...</p>
+      <a href={target} class="text-xs text-indigo-400 underline">Click here if not redirected automatically</a>
+    </div>
+  </body>
+</html>
+

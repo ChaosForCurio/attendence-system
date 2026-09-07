@@ -1,0 +1,17 @@
+{
+  "name": "Bhavya Computer Classes",
+  "short_name": "Bhavya Class",
+  "description": "Fast 1-Tap Student Attendance System for Bhavya Computer Classes",
+  "start_url": "/student",
+  "display": "standalone",
+  "background_color": "#4f46e5",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
