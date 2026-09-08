@@ -117,6 +117,7 @@ if (!session || session.role !== 'admin') {
           <thead class="bg-slate-900 text-slate-400 uppercase font-bold tracking-wider border-b border-white/10">
             <tr>
               <th class="p-4">Date</th>
+              <th class="p-4">Time</th>
               <th class="p-4">Student Name</th>
               <th class="p-4">Student Roll No</th>
               <th class="p-4">Class & Subject</th>
@@ -126,7 +127,7 @@ if (!session || session.role !== 'admin') {
           </thead>
           <tbody id="reports-table-body" class="divide-y divide-white/5 font-medium">
             <tr>
-              <td colspan="6" class="p-6 text-center text-slate-400">Loading attendance reports...</td>
+              <td colspan="7" class="p-6 text-center text-slate-400">Loading attendance reports...</td>
             </tr>
           </tbody>
         </table>
@@ -166,11 +167,13 @@ if (!session || session.role !== 'admin') {
 
     function generateSampleReports() {
       const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const makeTime = (hOffset: number) => new Date(now.getTime() - hOffset * 60000).toISOString();
       return [
-        { date: today, studentName: 'Rahul Kumar', studentNumber: 'BCA202601', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: new Date().toISOString() },
-        { date: today, studentName: 'Aman Sharma', studentNumber: 'BCA202602', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: new Date().toISOString() },
-        { date: today, studentName: 'Priya Verma', studentNumber: 'BCA202603', className: 'BCA 2A', subjectName: 'Web Development', status: 'absent', method: 'manual', markedAt: new Date().toISOString() },
-        { date: today, studentName: 'Vikram Singh', studentNumber: 'BCA202604', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: new Date().toISOString() }
+        { date: today, studentName: 'Rahul Kumar', studentNumber: 'BCA202601', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: makeTime(5) },
+        { date: today, studentName: 'Aman Sharma', studentNumber: 'BCA202602', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: makeTime(12) },
+        { date: today, studentName: 'Priya Verma', studentNumber: 'BCA202603', className: 'BCA 2A', subjectName: 'Web Development', status: 'absent', method: 'manual', markedAt: makeTime(20) },
+        { date: today, studentName: 'Vikram Singh', studentNumber: 'BCA202604', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: makeTime(8) }
       ];
     }
 
@@ -189,13 +192,20 @@ if (!session || session.role !== 'admin') {
     function renderReports(reports: any[]) {
       const tbody = document.getElementById('reports-table-body')!;
       if (reports.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No attendance logs found matching filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">No attendance logs found matching filters.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = reports.map((r: any) => `
+      tbody.innerHTML = reports.map((r: any) => {
+        // Format time from markedAt timestamp
+        const markedAtTime = r.markedAt
+          ? new Date(r.markedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
+          : '--:-- --';
+
+        return `
         <tr class="hover:bg-slate-900/50 transition">
           <td class="p-4 text-slate-400 font-mono">${r.date || 'Today'}</td>
+          <td class="p-4 text-slate-300 font-mono whitespace-nowrap">${markedAtTime}</td>
           <td class="p-4 font-bold text-white">${r.studentName}</td>
           <td class="p-4 text-slate-300 font-mono">${r.studentNumber}</td>
           <td class="p-4 text-slate-300">
@@ -213,7 +223,7 @@ if (!session || session.role !== 'admin') {
             </span>
           </td>
         </tr>
-      `).join('');
+      `}).join('');
     }
 
     // Filter handling

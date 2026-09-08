@@ -6,6 +6,8 @@ import {
   GraduationCap,
   Users,
   BarChart3,
+  QrCode,
+  BookOpen,
   LogOut,
   Menu,
   X,
@@ -103,6 +105,18 @@ const currentPath = Astro.url.pathname;
           </a>
 
           <a
+            href="/admin/qr"
+            class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
+              currentPath.startsWith('/admin/qr')
+                ? 'bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <QrCode class={`w-4 h-4 ${currentPath.startsWith('/admin/qr') ? 'text-brand-400' : 'text-slate-400'}`} />
+            <span>Attendance QR</span>
+          </a>
+
+          <a
             href="/admin/students"
             class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
               currentPath.startsWith('/admin/students')
@@ -124,6 +138,18 @@ const currentPath = Astro.url.pathname;
           >
             <Users class={`w-4 h-4 ${currentPath.startsWith('/admin/teachers') ? 'text-brand-400' : 'text-slate-400'}`} />
             <span>Faculty & Teachers</span>
+          </a>
+
+          <a
+            href="/admin/courses"
+            class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
+              currentPath.startsWith('/admin/courses')
+                ? 'bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <BookOpen class={`w-4 h-4 ${currentPath.startsWith('/admin/courses') ? 'text-brand-400' : 'text-slate-400'}`} />
+            <span>Assign Courses</span>
           </a>
 
           <a

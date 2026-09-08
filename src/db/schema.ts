@@ -185,6 +185,7 @@ export const attendanceVerifications = pgTable('attendance_verifications', {
     .notNull()
     .references(() => attendanceSessions.id, { onDelete: 'cascade' }),
   qrToken: text('qr_token').notNull(),
+  status: varchar('status', { length: 20 }).notNull().default('active'), // active, terminated
   gpsLat: numeric('gps_lat'),
   gpsLng: numeric('gps_lng'),
   allowedRadiusMeters: integer('allowed_radius_meters').default(100),

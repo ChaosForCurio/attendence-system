@@ -158,6 +158,25 @@ if (!session || session.role !== 'admin') {
           <label class="block text-slate-300 font-semibold mb-1">Student Roll Number / ID</label>
           <input type="text" id="new-std-no" required placeholder="e.g. BCA202605" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
         </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Class / Program</label>
+            <select id="new-std-class" class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              <option value="cls_bca_2a">BCA 2nd Year</option>
+              <option value="cls_pgdca">PGDCA</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Section</label>
+            <select id="new-std-section" class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              <option value="A">Section A</option>
+              <option value="B">Section B</option>
+              <option value="C">Section C</option>
+            </select>
+          </div>
+        </div>
+
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Email Address</label>
           <input type="email" id="new-std-email" required placeholder="rahul@bhavyacomputerclasses.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
@@ -168,7 +187,7 @@ if (!session || session.role !== 'admin') {
         </div>
 
         <button type="submit" id="submit-student-btn" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold transition mt-3 shadow-lg shadow-brand-600/20">
-          Enroll Student
+          Enroll Student &amp; Generate Credentials
         </button>
       </form>
     </div>
@@ -379,6 +398,8 @@ if (!session || session.role !== 'admin') {
 
       const name = (document.getElementById('new-std-name') as HTMLInputElement).value;
       const studentNumber = (document.getElementById('new-std-no') as HTMLInputElement).value;
+      const classId = (document.getElementById('new-std-class') as HTMLSelectElement).value || 'cls_bca_2a';
+      const section = (document.getElementById('new-std-section') as HTMLSelectElement).value || 'A';
       const email = (document.getElementById('new-std-email') as HTMLInputElement).value;
       const password = (document.getElementById('new-std-pass') as HTMLInputElement).value;
 
@@ -391,7 +412,8 @@ if (!session || session.role !== 'admin') {
             email,
             password,
             studentNumber,
-            classId: 'cls_bca_2a'
+            classId,
+            section,
           })
         });
 

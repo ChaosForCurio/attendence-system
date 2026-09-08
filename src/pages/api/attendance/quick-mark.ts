@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { db, schema } from '@/db';
 import { eq, and } from 'drizzle-orm';
 import { requireRole } from '@/lib/permissions';
+import { checkQrTokenStatus } from '@/lib/attendance';
 
 export const POST: APIRoute = async ({ request }) => {
   const { session, response } = requireRole(request, ['student']);
@@ -16,6 +17,39 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({ error: 'Student class profile is incomplete.' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Check optional token validation if provided in request body or url
+    let qrToken = '';
+    try {
+      const requestData = await request.clone().json();
+      qrToken = requestData.qrToken || requestData.token || '';
+    } catch (e) {}
+
+    const url = new URL(request.url);
+    if (!qrToken) {
+      qrToken = url.searchParams.get('token') || url.searchParams.get('qrToken') || '';
+    }
+
+    if (qrToken) {
+      const qrCheck = checkQrTokenStatus(qrToken);
+      if (qrCheck.status === 'terminated') {
+        return new Response(
+          JSON.stringify({
+            error: '❌ QR CODE TERMINATED: This QR code has been invalidated by the instructor. Please scan the newly generated QR code on screen.',
+            status: 'terminated',
+          }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      } else if (qrCheck.status === 'invalid') {
+        return new Response(
+          JSON.stringify({
+            error: 'Invalid QR verification token.',
+            status: 'invalid',
+          }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Get student details

@@ -37,6 +37,8 @@ export const createStudentSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
   studentNumber: z.string().min(2, 'Student number is required'),
   classId: z.string().min(1, 'Class ID is required'),
+  section: z.string().optional(),
+  subjectIds: z.array(z.string()).optional(),
 });
 
 export const createTeacherSchema = z.object({

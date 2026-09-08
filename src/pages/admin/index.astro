@@ -9,6 +9,7 @@ import {
   Download,
   Users,
   BarChart3,
+  QrCode,
   ArrowRight,
   Sparkles,
   CheckCircle2,
@@ -37,6 +38,13 @@ if (!session || session.role !== 'admin') {
       </div>
 
       <div class="flex items-center gap-3">
+        <a
+          href="/admin/qr"
+          class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition active:scale-95"
+        >
+          <QrCode class="w-4 h-4" />
+          <span>Attendance QR Center</span>
+        </a>
         <a
           href="/api/admin/reports?format=csv"
           onclick="showToast('Exporting comprehensive attendance report...', 'success')"
@@ -113,7 +121,24 @@ if (!session || session.role !== 'admin') {
         <span>Quick Access Hub</span>
       </h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Attendance QR Link -->
+        <a
+          href="/admin/qr"
+          class="group p-6 rounded-3xl bg-slate-950/80 border border-brand-500/30 hover:border-brand-500/80 transition-all duration-300 shadow-glass-dark space-y-4 hover:-translate-y-1 relative overflow-hidden"
+        >
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-400 flex items-center justify-center group-hover:scale-110 transition">
+              <QrCode class="w-6 h-6" />
+            </div>
+            <ArrowRight class="w-5 h-5 text-slate-500 group-hover:text-brand-400 group-hover:translate-x-1 transition" />
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-white group-hover:text-brand-300 transition">Attendance QR</h3>
+            <p class="text-xs text-slate-400 mt-1">Generate dynamic QR codes & terminate previous tokens.</p>
+          </div>
+        </a>
+
         <!-- Student Directory Link -->
         <a
           href="/admin/students"

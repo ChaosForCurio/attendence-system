@@ -1,5 +1,5 @@
 import { hashPassword, comparePassword, createSessionToken, verifySessionToken } from '../lib/auth';
-import { calculateAttendanceStats, evaluateSessionStatus, generateQrToken, verifyQrToken } from '../lib/attendance';
+import { calculateAttendanceStats, evaluateSessionStatus, generateQrToken, verifyQrToken, generateNewAdminQrToken, checkQrTokenStatus } from '../lib/attendance';
 import { markAttendanceSchema, createSessionSchema } from '../lib/validation';
 
 async function runAllTests() {
@@ -68,12 +68,22 @@ async function runAllTests() {
   const closedStatus = evaluateSessionStatus('08:00', '08:15', '08:10', '08:20');
   assert(closedStatus === 'closed', 'Session evaluated as closed when current time is past end time');
 
-  // Test Group 4: Dynamic QR Token Generation & Verification
-  console.log('\n--- Test Group 4: Dynamic QR Token Security ---');
+  // Test Group 4: Dynamic QR Token Security & Token Invalidation
+  console.log('\n--- Test Group 4: Dynamic QR Token Security & Token Invalidation ---');
   const qr = generateQrToken('sess_12345', 10);
   assert(typeof qr.token === 'string', 'QR token string generated');
   assert(verifyQrToken(qr.token, 'sess_12345') === true, 'Valid QR token verified successfully');
   assert(verifyQrToken(qr.token, 'sess_WRONG') === false, 'QR token rejected for wrong session ID');
+
+  // Test Admin Dynamic QR Generation and Termination of Previous Tokens
+  const firstQr = generateNewAdminQrToken('sess_test_invalidation', '#ATT-TEST-001');
+  assert(firstQr.status === 'active', 'First QR code token is active');
+  assert(checkQrTokenStatus(firstQr.token, 'sess_test_invalidation').status === 'active', 'First QR token check returns active');
+
+  const secondQr = generateNewAdminQrToken('sess_test_invalidation', '#ATT-TEST-001');
+  assert(secondQr.status === 'active', 'Second QR code token is active');
+  assert(checkQrTokenStatus(firstQr.token, 'sess_test_invalidation').status === 'terminated', 'Previous (first) QR token state is TERMINATED');
+  assert(checkQrTokenStatus(secondQr.token, 'sess_test_invalidation').status === 'active', 'New (second) QR token state is ACTIVE');
 
   // Test Group 5: Zod Schema Validation
   console.log('\n--- Test Group 5: Zod Input Validation Schemas ---');
