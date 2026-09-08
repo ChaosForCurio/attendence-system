@@ -14,28 +14,66 @@ const currentPath = Astro.url.pathname;
 ---
 
 <BaseLayout title={title}>
-  <!-- Top Mobile App Header -->
-  <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-4 py-3 shadow-sm transition-all">
-    <div class="max-w-md mx-auto flex items-center justify-between">
+  <!-- Top Responsive Header -->
+  <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/80 py-3 shadow-sm transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-brand-500/25 ring-2 ring-white">
           {session.name.charAt(0)}
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h1 class="text-sm font-bold text-slate-900 leading-tight">{session.name}</h1>
+            <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">{session.name}</h1>
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
           </div>
-          <p class="text-[11px] text-brand-600 font-semibold flex items-center gap-1">
+          <p class="text-[11px] sm:text-xs text-brand-600 font-semibold flex items-center gap-1">
             <span>Bhavya Classes</span>
             <span class="text-slate-300">•</span>
             <span class="text-slate-500 font-medium">Student</span>
           </p>
         </div>
       </div>
+
+      <!-- Desktop Navigation Bar (Visible on md and larger) -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60 shadow-inner">
+        <a
+          href="/student"
+          class={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all duration-200 ${
+            currentPath === '/student' || currentPath === '/student/'
+              ? 'bg-white text-brand-600 shadow-sm'
+              : 'text-slate-600 hover:text-brand-600 hover:bg-white/50'
+          }`}
+        >
+          <Home class="w-4 h-4" />
+          <span>Dashboard</span>
+        </a>
+        <a
+          href="/student/schedule"
+          class={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all duration-200 ${
+            currentPath.startsWith('/student/schedule')
+              ? 'bg-white text-brand-600 shadow-sm'
+              : 'text-slate-600 hover:text-brand-600 hover:bg-white/50'
+          }`}
+        >
+          <Calendar class="w-4 h-4" />
+          <span>Schedule</span>
+        </a>
+        <a
+          href="/student/history"
+          class={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all duration-200 ${
+            currentPath.startsWith('/student/history')
+              ? 'bg-white text-brand-600 shadow-sm'
+              : 'text-slate-600 hover:text-brand-600 hover:bg-white/50'
+          }`}
+        >
+          <Clock class="w-4 h-4" />
+          <span>History</span>
+        </a>
+      </nav>
+
       <button
         id="logout-btn"
-        class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100/80 hover:bg-rose-50 px-3 py-1.5 rounded-xl border border-slate-200/60 transition-all duration-200 active:scale-95"
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100/80 hover:bg-rose-50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-slate-200/60 transition-all duration-200 active:scale-95"
         title="Sign Out"
       >
         <LogOut class="w-3.5 h-3.5" />
@@ -45,12 +83,12 @@ const currentPath = Astro.url.pathname;
   </header>
 
   <!-- Main Content Area -->
-  <main class="flex-1 max-w-md mx-auto w-full px-4 pt-4 pb-24">
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-24 md:pb-12">
     <slot />
   </main>
 
-  <!-- Bottom Touch-Optimized Floating Glass Navigation Bar -->
-  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-lg border-t border-slate-200/80 shadow-lg">
+  <!-- Bottom Touch-Optimized Floating Glass Navigation Bar (Mobile only) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-lg border-t border-slate-200/80 shadow-lg md:hidden">
     <div class="max-w-md mx-auto flex justify-around items-center h-16 px-3">
       <a
         href="/student"
