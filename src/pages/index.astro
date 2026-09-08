@@ -6,7 +6,7 @@ const session = getSessionFromRequest(Astro.request);
 let target = '/login';
 if (session) {
   if (session.role === 'student') target = '/student';
-  else if (session.role === 'teacher') target = '/teacher';
+  else if (session.role === 'teacher') target = '/admin';
   else if (session.role === 'admin') target = '/admin';
 }
 

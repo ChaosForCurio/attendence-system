@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ request }) => {
       })
       .from(schema.students)
       .innerJoin(schema.users, eq(schema.students.userId, schema.users.id))
-      .innerJoin(schema.classes, eq(schema.students.classId, schema.classes.id));
+      .leftJoin(schema.classes, eq(schema.students.classId, schema.classes.id));
 
     return new Response(JSON.stringify({ students: list }), {
       status: 200,
@@ -54,7 +54,28 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const { name, email, password, studentNumber, classId } = result.data;
+    const { name, email, password, studentNumber } = result.data;
+    let targetClassId = result.data.classId;
+
+    // Check if class exists in database
+    const existingClass = await db
+      .select()
+      .from(schema.classes)
+      .where(eq(schema.classes.id, targetClassId))
+      .limit(1);
+
+    if (!existingClass[0]) {
+      // Fallback to first available class if the selected class ID does not exist
+      const allClasses = await db.select().from(schema.classes).limit(1);
+      if (allClasses[0]) {
+        targetClassId = allClasses[0].id;
+      } else {
+        return new Response(
+          JSON.stringify({ error: 'No classes found in the system. Please create a class first.' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     // Check if email already exists
     const existingUser = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
@@ -84,7 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
       id: studentId,
       userId,
       studentNumber,
-      classId,
+      classId: targetClassId,
     });
 
     // Audit log

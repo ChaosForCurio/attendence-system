@@ -14,7 +14,7 @@ import {
 const session = getSessionFromRequest(Astro.request);
 if (session) {
   if (session.role === 'student') return Astro.redirect('/student');
-  if (session.role === 'teacher') return Astro.redirect('/teacher');
+  if (session.role === 'teacher') return Astro.redirect('/admin');
   if (session.role === 'admin') return Astro.redirect('/admin');
 }
 ---
@@ -223,7 +223,7 @@ if (session) {
         } else if (data.user.role === 'student') {
           window.location.href = '/student';
         } else if (data.user.role === 'teacher') {
-          window.location.href = '/teacher';
+          window.location.href = '/admin';
         } else {
           window.location.href = '/admin';
         }

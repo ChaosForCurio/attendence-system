@@ -279,6 +279,36 @@ if (!session || session.role !== 'admin') {
 
   <script>
     let allStudents: any[] = [];
+    let availableClasses: any[] = [];
+
+    async function loadClasses() {
+      try {
+        const res = await fetch('/api/admin/classes');
+        if (res.ok) {
+          const data = await res.json();
+          availableClasses = data.classes || [];
+          populateClassSelects(availableClasses);
+        }
+      } catch (err) {
+        console.error('Failed to load classes:', err);
+      }
+    }
+
+    function populateClassSelects(classes: any[]) {
+      const classSelect = document.getElementById('new-std-class') as HTMLSelectElement;
+      const batchFilter = document.getElementById('batch-filter') as HTMLSelectElement;
+
+      if (classSelect && classes.length > 0) {
+        classSelect.innerHTML = classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      }
+
+      if (batchFilter && classes.length > 0) {
+        const existingVal = batchFilter.value;
+        batchFilter.innerHTML = `<option value="all">All Batches</option>` +
+          classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        batchFilter.value = existingVal;
+      }
+    }
 
     async function loadStudents() {
       try {
@@ -290,9 +320,9 @@ if (!session || session.role !== 'admin') {
           renderStudents(allStudents);
         } else {
           allStudents = [
-            { name: 'Rahul Kumar', studentNumber: 'BCA202601', email: 'student1@bhavyacomputerclasses.com', className: 'BCA 2A', status: 'active' },
-            { name: 'Aman Sharma', studentNumber: 'BCA202602', email: 'student2@bhavyacomputerclasses.com', className: 'BCA 2A', status: 'active' },
-            { name: 'Priya Verma', studentNumber: 'BCA202603', email: 'priya@bhavyacomputerclasses.com', className: 'BCA 2A', status: 'active' }
+            { name: 'Rahul Kumar', studentNumber: 'BCA202601', email: 'student1@bhavyacomputerclasses.com', className: 'Batch 2026-A (Web & Python)', status: 'active' },
+            { name: 'Aman Sharma', studentNumber: 'BCA202602', email: 'student2@bhavyacomputerclasses.com', className: 'Batch 2026-A (Web & Python)', status: 'active' },
+            { name: 'Priya Verma', studentNumber: 'BCA202603', email: 'priya@bhavyacomputerclasses.com', className: 'Batch 2026-A (Web & Python)', status: 'active' }
           ];
           document.getElementById('stat-total-students')!.textContent = allStudents.length.toString();
           renderStudents(allStudents);
@@ -436,6 +466,7 @@ if (!session || session.role !== 'admin') {
       }
     });
 
+    loadClasses();
     loadStudents();
   </script>
 </AdminLayout>
