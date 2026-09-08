@@ -16,15 +16,29 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const { email, password } = result.data;
+    const { email: identifier, password } = result.data;
 
-    // Fetch user from DB
-    const userRecords = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
-    const user = userRecords[0];
+    // Fetch user from DB by email or studentNumber
+    let user: any = null;
+
+    // 1. Check by email
+    const emailMatch = await db.select().from(schema.users).where(eq(schema.users.email, identifier.trim())).limit(1);
+    if (emailMatch[0]) {
+      user = emailMatch[0];
+    } else {
+      // 2. Check by student ID / Roll Number
+      const studentMatch = await db.select().from(schema.students).where(eq(schema.students.studentNumber, identifier.trim())).limit(1);
+      if (studentMatch[0]) {
+        const linkedUser = await db.select().from(schema.users).where(eq(schema.users.id, studentMatch[0].userId)).limit(1);
+        if (linkedUser[0]) {
+          user = linkedUser[0];
+        }
+      }
+    }
 
     if (!user || user.status !== 'active') {
       return new Response(
-        JSON.stringify({ error: 'Invalid credentials or inactive account.' }),
+        JSON.stringify({ error: 'Invalid Student ID / Email or inactive account.' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }

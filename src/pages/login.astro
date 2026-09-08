@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getSessionFromRequest } from '@/lib/auth';
 import {
@@ -110,15 +110,15 @@ if (session) {
         <div id="error-banner" class="hidden mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs font-semibold"></div>
 
         <form id="login-form" class="space-y-5">
-          <!-- Email -->
+          <!-- Student ID / Email -->
           <div>
-            <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+            <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Student ID or Email</label>
             <input
-              type="email"
+              type="text"
               id="email"
               name="email"
               required
-              placeholder="E.g student@bhavyacomputerclasses.com"
+              placeholder="e.g. BCA202601 or student@bhavyacomputerclasses.com"
               class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent text-sm transition"
             />
           </div>
@@ -216,9 +216,17 @@ if (session) {
         }
 
         (window as any).showToast?.('Login successful! Redirecting...', 'success', 2000);
-        if (data.user.role === 'student') window.location.href = '/student';
-        else if (data.user.role === 'teacher') window.location.href = '/teacher';
-        else window.location.href = '/admin';
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else if (data.user.role === 'student') {
+          window.location.href = '/student';
+        } else if (data.user.role === 'teacher') {
+          window.location.href = '/teacher';
+        } else {
+          window.location.href = '/admin';
+        }
 
       } catch (err) {
         errorBanner.textContent = 'Network error occurred. Please try again.';

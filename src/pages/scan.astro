@@ -1,0 +1,269 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getSessionFromRequest } from '@/lib/auth';
+import { QrCode, CheckCircle2, AlertCircle, ArrowRight, Lock, Sparkles, UserCheck, ShieldCheck } from 'lucide-astro';
+
+const session = getSessionFromRequest(Astro.request);
+const isStudentLoggedIn = session && session.role === 'student';
+---
+
+<BaseLayout title="Permanent QR Attendance Scan - Bhavya Computer Classes">
+  <div class="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden">
+    
+    <!-- Background Ambient Glow -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-500/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-10 right-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-lg relative z-10 space-y-6">
+
+      <!-- Header Branding -->
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-white/10 text-brand-400 text-xs font-bold tracking-wide">
+          <QrCode class="w-4 h-4" />
+          <span>Classroom Permanent QR Scanner</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Bhavya Computer Classes</h1>
+        <p class="text-xs text-slate-400">Automated Attendance Portal • Powered by Astro & Neon DB</p>
+      </div>
+
+      <!-- Flow Container -->
+      <div class="bg-slate-900/90 border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
+
+        <!-- STATE 1: NOT LOGGED IN - LOGIN & VERIFY ACCOUNT FORM -->
+        <div id="unauthenticated-step" class={isStudentLoggedIn ? 'hidden' : 'space-y-5'}>
+          <div class="text-center space-y-1.5 border-b border-white/10 pb-4">
+            <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-2">
+              <Lock class="w-6 h-6" />
+            </div>
+            <h2 class="text-lg font-bold text-white">Student Account Verification</h2>
+            <p class="text-xs text-slate-400">Enter your Student ID & Password provided by Admin to mark attendance</p>
+          </div>
+
+          <div id="scan-login-error" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold text-center"></div>
+
+          <form id="scan-login-form" class="space-y-4 text-xs">
+            <div>
+              <label for="scan-identifier" class="block text-slate-300 font-semibold mb-1.5">Student ID / Roll No or Email</label>
+              <input
+                type="text"
+                id="scan-identifier"
+                required
+                placeholder="e.g. BCA202601 or student@bhavyacomputerclasses.com"
+                class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium transition"
+              />
+            </div>
+
+            <div>
+              <label for="scan-password" class="block text-slate-300 font-semibold mb-1.5">Password</label>
+              <input
+                type="password"
+                id="scan-password"
+                required
+                placeholder="••••••••"
+                class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium transition"
+              />
+            </div>
+
+            <button
+              type="submit"
+              id="scan-login-btn"
+              class="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold transition shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 active:scale-95 text-sm"
+            >
+              <span>Verify & Mark Attendance</span>
+              <ArrowRight class="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+
+        <!-- STATE 2: PROCESSING ATTENDANCE -->
+        <div id="processing-step" class={isStudentLoggedIn ? 'space-y-4 py-6 text-center' : 'hidden space-y-4 py-6 text-center'}>
+          <div class="relative w-16 h-16 mx-auto">
+            <div class="w-16 h-16 rounded-full border-4 border-brand-500/20 border-t-brand-500 animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-brand-400">
+              <UserCheck class="w-6 h-6" />
+            </div>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Verifying Account & Marking Attendance...</h3>
+            <p class="text-xs text-slate-400 mt-1">Updating Neon Database records in real time</p>
+          </div>
+        </div>
+
+        <!-- STATE 3: ATTENDANCE RECORD CONFIRMATION CARD (MATCHING USER DIAGRAM) -->
+        <div id="result-step" class="hidden space-y-6">
+          <div class="text-center space-y-2">
+            <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto animate-bounce">
+              <CheckCircle2 class="w-8 h-8" />
+            </div>
+            <h2 id="result-title" class="text-xl font-black text-white">Attendance Recorded!</h2>
+            <p id="result-subtitle" class="text-xs text-slate-400">Your presence has been saved to the institutional database.</p>
+          </div>
+
+          <!-- Exact Formatted Card from User Blueprint -->
+          <div class="bg-slate-950 rounded-2xl border-2 border-emerald-500/40 p-5 space-y-3 shadow-xl relative overflow-hidden font-mono">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest font-sans">Attendance Record</span>
+              <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold font-sans">
+                LIVE NEON DB
+              </span>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Student:</span>
+                <span id="card-student" class="font-bold text-white">Rahul Kumar</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Student ID:</span>
+                <span id="card-studentid" class="text-slate-300">BCA202601</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Course:</span>
+                <span id="card-course" class="font-bold text-brand-400">BCA</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Date:</span>
+                <span id="card-date" class="text-slate-300">08 Sep 2026</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Time:</span>
+                <span id="card-time" class="text-slate-300">08:17:32 AM</span>
+              </div>
+              <div class="flex items-center justify-between pt-2 border-t border-white/10">
+                <span class="text-slate-400 font-sans font-bold">Status:</span>
+                <span id="card-status" class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-sans">
+                  PRESENT ✓
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <a
+              href="/student"
+              class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition border border-white/10"
+            >
+              Student Dashboard
+            </a>
+            <button
+              type="button"
+              onclick="window.location.reload()"
+              class="py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition shadow-lg shadow-brand-600/20"
+            >
+              Scan Again
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="text-center text-[11px] text-slate-500">
+        Bhavya Computer Classes • Vercel Serverless & Neon PostgreSQL Database
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const unauthStep = document.getElementById('unauthenticated-step')!;
+    const processingStep = document.getElementById('processing-step')!;
+    const resultStep = document.getElementById('result-step')!;
+
+    const loginForm = document.getElementById('scan-login-form') as HTMLFormElement;
+    const identifierInput = document.getElementById('scan-identifier') as HTMLInputElement;
+    const passwordInput = document.getElementById('scan-password') as HTMLInputElement;
+    const errorBox = document.getElementById('scan-login-error')!;
+    const loginBtn = document.getElementById('scan-login-btn') as HTMLButtonElement;
+
+    const isAlreadyLoggedIn = !unauthStep.classList.contains('hidden');
+
+    async function executeMarkAttendance() {
+      unauthStep.classList.add('hidden');
+      processingStep.classList.remove('hidden');
+      resultStep.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/attendance/quick-mark', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        const data = await res.json();
+        processingStep.classList.add('hidden');
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            unauthStep.classList.remove('hidden');
+            errorBox.textContent = 'Please log in with your Student ID to mark attendance.';
+            errorBox.classList.remove('hidden');
+            return;
+          }
+
+          resultStep.classList.remove('hidden');
+          document.getElementById('result-title')!.textContent = 'Attendance Error';
+          document.getElementById('result-subtitle')!.textContent = data.error || 'Failed to mark attendance.';
+          document.getElementById('card-status')!.textContent = 'FAILED ✕';
+          document.getElementById('card-status')!.className = 'px-3 py-1 rounded-full text-xs font-black bg-rose-500/20 text-rose-400 border border-rose-500/40 font-sans';
+          return;
+        }
+
+        const details = data.attendanceDetails;
+        if (details) {
+          document.getElementById('card-student')!.textContent = details.studentName;
+          document.getElementById('card-studentid')!.textContent = details.studentNumber || 'BCA202601';
+          document.getElementById('card-course')!.textContent = details.course;
+          document.getElementById('card-date')!.textContent = details.date;
+          document.getElementById('card-time')!.textContent = details.time;
+          document.getElementById('card-status')!.textContent = details.status;
+        }
+
+        if (data.alreadyMarked) {
+          document.getElementById('result-title')!.textContent = 'Already Marked!';
+          document.getElementById('result-subtitle')!.textContent = 'Your attendance for today was already recorded.';
+        }
+
+        resultStep.classList.remove('hidden');
+      } catch (err) {
+        processingStep.classList.add('hidden');
+        unauthStep.classList.remove('hidden');
+        errorBox.textContent = 'Network error occurred. Please try again.';
+        errorBox.classList.remove('hidden');
+      }
+    }
+
+    loginForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.classList.add('hidden');
+      loginBtn.disabled = true;
+
+      try {
+        const loginRes = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: identifierInput.value, password: passwordInput.value }),
+        });
+
+        const loginData = await loginRes.json();
+
+        if (!loginRes.ok) {
+          errorBox.textContent = loginData.error || 'Authentication failed. Check your Student ID and password.';
+          errorBox.classList.remove('hidden');
+          loginBtn.disabled = false;
+          return;
+        }
+
+        // Successfully authenticated! Execute attendance marking immediately
+        executeMarkAttendance();
+      } catch (err) {
+        errorBox.textContent = 'Network connection issue.';
+        errorBox.classList.remove('hidden');
+        loginBtn.disabled = false;
+      }
+    });
+
+    // If student is already authenticated when landing on page, immediately mark attendance
+    if (document.cookie.includes('auth_session=')) {
+      executeMarkAttendance();
+    }
+  </script>
+</BaseLayout>

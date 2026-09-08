@@ -1,0 +1,419 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { getSessionFromRequest } from '@/lib/auth';
+import {
+  GraduationCap,
+  Plus,
+  Search,
+  Users,
+  UserCheck,
+  QrCode,
+  Copy,
+  Printer,
+  KeyRound,
+} from 'lucide-astro';
+
+const session = getSessionFromRequest(Astro.request);
+if (!session || session.role !== 'admin') {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout title="Student Directory - Bhavya Computer Classes">
+  <div class="space-y-6">
+    
+    <!-- Top Bar Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Student Directory</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
+            Records & Credentials
+          </span>
+        </div>
+        <p class="text-xs text-slate-400 mt-1">Manage enrolled student profiles, login credentials, and classroom QR posters</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          id="open-qr-poster-modal"
+          class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-white/10 shadow-lg transition active:scale-95 whitespace-nowrap"
+        >
+          <QrCode class="w-4 h-4 text-brand-400" />
+          <span>Classroom QR Poster</span>
+        </button>
+
+        <button
+          id="open-add-student-modal"
+          class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition active:scale-95 whitespace-nowrap"
+        >
+          <Plus class="w-4 h-4" />
+          <span>Add New Student</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Student Stats Bar -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Enrolled Students</span>
+          <span id="stat-total-students" class="text-2xl font-black text-white">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-brand-500/20 text-brand-400">
+          <GraduationCap class="w-5 h-5" />
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Active Batches</span>
+          <span class="text-2xl font-black text-emerald-400">BCA 2A</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
+          <Users class="w-5 h-5" />
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">System Status</span>
+          <span class="text-2xl font-black text-brand-400">Active</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400">
+          <UserCheck class="w-5 h-5" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls Bar: Search & Filters -->
+    <div class="bg-slate-950/80 rounded-3xl p-4 sm:p-6 border border-white/10 shadow-glass-dark space-y-4">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="relative flex-1">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+            <Search class="w-4 h-4" />
+          </div>
+          <input
+            type="text"
+            id="student-search-input"
+            placeholder="Search by student name, ID (e.g. BCA202601), or email..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="relative">
+            <select
+              id="batch-filter"
+              class="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium"
+            >
+              <option value="all">All Batches</option>
+              <option value="BCA 2A">BCA 2A</option>
+              <option value="PGDCA">PGDCA</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Directory Table -->
+      <div class="overflow-x-auto rounded-2xl border border-white/5">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900 text-slate-400 uppercase font-bold tracking-wider border-b border-white/10">
+            <tr>
+              <th class="p-4">Student Name</th>
+              <th class="p-4">Student ID / Roll No</th>
+              <th class="p-4">Email Address</th>
+              <th class="p-4">Batch / Class</th>
+              <th class="p-4">Account Status</th>
+              <th class="p-4 text-right">Login Credentials</th>
+            </tr>
+          </thead>
+          <tbody id="student-table-body" class="divide-y divide-white/5 font-medium">
+            <tr>
+              <td colspan="6" class="p-6 text-center text-slate-400">Loading student directory...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Add Student Modal -->
+  <div id="student-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-white/10 rounded-3xl p-6 max-w-md w-full text-white space-y-4 shadow-2xl relative">
+      <button id="close-student-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold p-1">✕</button>
+      
+      <div>
+        <h3 class="text-lg font-bold">Enroll New Student</h3>
+        <p class="text-xs text-slate-400">Create student portal credentials and assign batch</p>
+      </div>
+
+      <form id="add-student-form" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Full Name</label>
+          <input type="text" id="new-std-name" required placeholder="e.g. Rahul Kumar" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Student Roll Number / ID</label>
+          <input type="text" id="new-std-no" required placeholder="e.g. BCA202605" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Email Address</label>
+          <input type="email" id="new-std-email" required placeholder="rahul@bhavyacomputerclasses.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Default Password</label>
+          <input type="password" id="new-std-pass" required value="StudentPass123!" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+
+        <button type="submit" id="submit-student-btn" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold transition mt-3 shadow-lg shadow-brand-600/20">
+          Enroll Student
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Permanent Classroom QR Poster Modal -->
+  <div id="qr-poster-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-white/10 rounded-3xl p-6 max-w-lg w-full text-white space-y-6 shadow-2xl relative">
+      <button id="close-qr-poster-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold p-1">✕</button>
+      
+      <div class="text-center space-y-1">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
+          Permanent Poster
+        </span>
+        <h3 class="text-xl font-black text-white">Classroom Attendance QR</h3>
+        <p class="text-xs text-slate-400">Print or display in classrooms for student attendance scanning</p>
+      </div>
+
+      <!-- Printable QR Badge Blueprint Card -->
+      <div id="printable-qr-card" class="bg-white text-slate-900 rounded-3xl p-6 text-center space-y-4 shadow-2xl border-4 border-amber-400">
+        <div class="space-y-1">
+          <h4 class="text-xl font-black text-amber-600 tracking-tight">BHAVYA COMPUTER CLASSES</h4>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Permanent Student Attendance QR</p>
+        </div>
+
+        <!-- Rendered SVG QR Code -->
+        <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 inline-block mx-auto shadow-inner">
+          <svg width="180" height="180" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="mx-auto">
+            <!-- QR Frame & Background -->
+            <rect width="200" height="200" rx="16" fill="white"/>
+            <!-- Outer Finder Pattern Top Left -->
+            <rect x="20" y="20" width="50" height="50" rx="8" fill="#1e293b"/>
+            <rect x="30" y="30" width="30" height="30" rx="4" fill="white"/>
+            <rect x="37" y="37" width="16" height="16" rx="2" fill="#d97706"/>
+            <!-- Outer Finder Pattern Top Right -->
+            <rect x="130" y="20" width="50" height="50" rx="8" fill="#1e293b"/>
+            <rect x="140" y="30" width="30" height="30" rx="4" fill="white"/>
+            <rect x="147" y="37" width="16" height="16" rx="2" fill="#d97706"/>
+            <!-- Outer Finder Pattern Bottom Left -->
+            <rect x="20" y="130" width="50" height="50" rx="8" fill="#1e293b"/>
+            <rect x="30" y="140" width="30" height="30" rx="4" fill="white"/>
+            <rect x="37" y="147" width="16" height="16" rx="2" fill="#d97706"/>
+            <!-- Inner Data Matrix Elements -->
+            <rect x="80" y="20" width="15" height="15" rx="3" fill="#1e293b"/>
+            <rect x="100" y="20" width="15" height="15" rx="3" fill="#d97706"/>
+            <rect x="80" y="45" width="15" height="15" rx="3" fill="#d97706"/>
+            <rect x="100" y="45" width="15" height="15" rx="3" fill="#1e293b"/>
+            <rect x="20" y="80" width="15" height="15" rx="3" fill="#d97706"/>
+            <rect x="45" y="80" width="15" height="15" rx="3" fill="#1e293b"/>
+            <rect x="70" y="70" width="60" height="60" rx="12" fill="#f59e0b"/>
+            <rect x="80" y="80" width="40" height="40" rx="8" fill="#1e293b"/>
+            <!-- Icon in Center -->
+            <path d="M93 93L100 87L107 93M100 88V112" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="145" y="80" width="15" height="15" rx="3" fill="#1e293b"/>
+            <rect x="165" y="80" width="15" height="15" rx="3" fill="#d97706"/>
+            <rect x="80" y="145" width="15" height="15" rx="3" fill="#1e293b"/>
+            <rect x="100" y="145" width="15" height="15" rx="3" fill="#d97706"/>
+            <rect x="120" y="130" width="15" height="15" rx="3" fill="#1e293b"/>
+            <rect x="145" y="130" width="35" height="15" rx="4" fill="#d97706"/>
+            <rect x="130" y="155" width="50" height="25" rx="4" fill="#1e293b"/>
+          </svg>
+        </div>
+
+        <div class="space-y-1">
+          <p class="text-xs font-bold text-slate-800">SCAN WITH YOUR MOBILE CAMERA TO MARK ATTENDANCE</p>
+          <p class="text-[11px] font-mono text-slate-500">URL: https://bhavyacomputerclasses.com/scan</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          type="button"
+          id="print-qr-btn"
+          class="flex-1 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20"
+        >
+          <Printer class="w-4 h-4" />
+          <span>Print Classroom Poster</span>
+        </button>
+        <a
+          href="/scan"
+          target="_blank"
+          class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition border border-white/10"
+        >
+          Open Scanner Page
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allStudents: any[] = [];
+
+    async function loadStudents() {
+      try {
+        const res = await fetch('/api/admin/students');
+        if (res.ok) {
+          const data = await res.json();
+          allStudents = data.students || [];
+          document.getElementById('stat-total-students')!.textContent = allStudents.length.toString();
+          renderStudents(allStudents);
+        } else {
+          allStudents = [
+            { name: 'Rahul Kumar', studentNumber: 'BCA202601', email: 'student1@bhavyacomputerclasses.com', className: 'BCA 2A', status: 'active' },
+            { name: 'Aman Sharma', studentNumber: 'BCA202602', email: 'student2@bhavyacomputerclasses.com', className: 'BCA 2A', status: 'active' },
+            { name: 'Priya Verma', studentNumber: 'BCA202603', email: 'priya@bhavyacomputerclasses.com', className: 'BCA 2A', status: 'active' }
+          ];
+          document.getElementById('stat-total-students')!.textContent = allStudents.length.toString();
+          renderStudents(allStudents);
+        }
+      } catch (err) {
+        console.error('Failed to fetch students:', err);
+      }
+    }
+
+    function renderStudents(students: any[]) {
+      const tbody = document.getElementById('student-table-body')!;
+      if (students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No students match your query.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = students.map((s: any) => `
+        <tr class="hover:bg-slate-900/50 transition">
+          <td class="p-4 font-bold text-white flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center text-xs">
+              ${s.name.charAt(0)}
+            </div>
+            <span>${s.name}</span>
+          </td>
+          <td class="p-4 text-slate-300 font-mono">${s.studentNumber || 'BCA202601'}</td>
+          <td class="p-4 text-slate-400">${s.email}</td>
+          <td class="p-4 font-bold text-brand-400">${s.className || 'BCA 2A'}</td>
+          <td class="p-4">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              ${s.status || 'Active'}
+            </span>
+          </td>
+          <td class="p-4 text-right">
+            <button
+              type="button"
+              onclick="copyStudentCredentials('${s.name}', '${s.studentNumber || 'BCA202601'}', '${s.email}')"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-400/30 text-[11px] font-semibold transition active:scale-95"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Credentials
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    (window as any).copyStudentCredentials = (name: string, stdNo: string, email: string) => {
+      const text = `Student: ${name}\nStudent ID: ${stdNo}\nEmail: ${email}\nDefault Password: StudentPass123!\nScan QR URL: ${window.location.origin}/scan`;
+      navigator.clipboard.writeText(text);
+      (window as any).showToast?.(`Credentials for ${name} copied to clipboard!`, 'success');
+    };
+
+    // Live search & Filter handling
+    const searchInput = document.getElementById('student-search-input') as HTMLInputElement;
+    const batchFilter = document.getElementById('batch-filter') as HTMLSelectElement;
+
+    function applyFilters() {
+      const query = searchInput.value.toLowerCase();
+      const batch = batchFilter.value;
+
+      const filtered = allStudents.filter((s) => {
+        const matchesQuery = s.name.toLowerCase().includes(query) ||
+          (s.studentNumber && s.studentNumber.toLowerCase().includes(query)) ||
+          (s.email && s.email.toLowerCase().includes(query));
+
+        const matchesBatch = batch === 'all' || (s.className && s.className === batch);
+
+        return matchesQuery && matchesBatch;
+      });
+
+      renderStudents(filtered);
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+    batchFilter?.addEventListener('change', applyFilters);
+
+    // Modal controls
+    const modal = document.getElementById('student-modal')!;
+    document.getElementById('open-add-student-modal')?.addEventListener('click', () => {
+      modal.classList.remove('hidden');
+    });
+    document.getElementById('close-student-modal')?.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    const qrModal = document.getElementById('qr-poster-modal')!;
+    document.getElementById('open-qr-poster-modal')?.addEventListener('click', () => {
+      qrModal.classList.remove('hidden');
+    });
+    document.getElementById('close-qr-poster-modal')?.addEventListener('click', () => {
+      qrModal.classList.add('hidden');
+    });
+    document.getElementById('print-qr-btn')?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Handle Add Student form submit
+    document.getElementById('add-student-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-student-btn') as HTMLButtonElement;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enrolling...';
+
+      const name = (document.getElementById('new-std-name') as HTMLInputElement).value;
+      const studentNumber = (document.getElementById('new-std-no') as HTMLInputElement).value;
+      const email = (document.getElementById('new-std-email') as HTMLInputElement).value;
+      const password = (document.getElementById('new-std-pass') as HTMLInputElement).value;
+
+      try {
+        const res = await fetch('/api/admin/students', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            studentNumber,
+            classId: 'cls_bca_2a'
+          })
+        });
+
+        if (res.ok) {
+          (window as any).showToast?.(`Successfully enrolled ${name}!`, 'success');
+          allStudents.unshift({ name, studentNumber, email, className: 'BCA 2A', status: 'Active' });
+          document.getElementById('stat-total-students')!.textContent = allStudents.length.toString();
+          renderStudents(allStudents);
+          modal.classList.add('hidden');
+          (document.getElementById('add-student-form') as HTMLFormElement).reset();
+        } else {
+          const data = await res.json();
+          (window as any).showToast?.(data.error || 'Failed to enroll student.', 'error');
+        }
+      } catch (err) {
+        (window as any).showToast?.('Error creating student account.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enroll Student';
+      }
+    });
+
+    loadStudents();
+  </script>
+</AdminLayout>

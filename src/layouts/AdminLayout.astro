@@ -5,28 +5,62 @@ import {
   LayoutDashboard,
   GraduationCap,
   Users,
-  BookOpen,
   BarChart3,
-  ShieldCheck,
   LogOut,
-  ExternalLink,
+  Menu,
+  X,
 } from 'lucide-astro';
-
 
 const { title = 'Admin Portal - Bhavya Computer Classes' } = Astro.props;
 const session = getSessionFromRequest(Astro.request);
 if (!session || session.role !== 'admin') {
   return Astro.redirect('/login');
 }
+
+const currentPath = Astro.url.pathname;
 ---
 
 <BaseLayout title={title}>
-  <div class="min-h-screen flex flex-col md:flex-row bg-slate-900 text-slate-100">
+  <div class="min-h-screen flex flex-col md:flex-row bg-slate-900 text-slate-100 relative">
+    
+    <!-- Mobile Top Navigation Header -->
+    <header class="md:hidden flex items-center justify-between px-4 py-3 bg-slate-950 border-b border-slate-800/80 sticky top-0 z-40">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white font-black flex items-center justify-center text-sm shadow-md ring-1 ring-white/10">
+          B
+        </div>
+        <div>
+          <h2 class="font-bold text-xs text-white tracking-tight leading-none">Bhavya Classes</h2>
+          <p class="text-[10px] text-brand-400 font-semibold mt-0.5">Admin Portal</p>
+        </div>
+      </div>
+
+      <!-- Hamburger Toggle Button -->
+      <button
+        id="mobile-sidebar-toggle"
+        type="button"
+        aria-label="Toggle navigation menu"
+        class="p-2 rounded-xl bg-slate-900 text-slate-300 hover:text-white border border-slate-800 transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+      >
+        <Menu id="hamburger-open-icon" class="w-5 h-5 block" />
+        <X id="hamburger-close-icon" class="w-5 h-5 hidden" />
+      </button>
+    </header>
+
+    <!-- Mobile Drawer Backdrop -->
+    <div
+      id="sidebar-backdrop"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden md:hidden transition-opacity duration-300 opacity-0"
+    ></div>
+
     <!-- Sidebar Navigation -->
-    <aside class="w-full md:w-64 bg-slate-950 text-white flex-shrink-0 border-r border-slate-800/80 flex flex-col justify-between">
+    <aside
+      id="admin-sidebar"
+      class="fixed inset-y-0 left-0 z-50 w-72 md:w-64 bg-slate-950 text-white flex-shrink-0 border-r border-slate-800/80 flex flex-col justify-between transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none"
+    >
       <div>
-        <!-- Brand Header -->
-        <div class="p-5 border-b border-slate-800/80 flex items-center justify-between">
+        <!-- Brand Header (Desktop) -->
+        <div class="p-5 border-b border-slate-800/80 hidden md:flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white font-black flex items-center justify-center text-base shadow-lg shadow-brand-500/25 ring-2 ring-white/10">
               B
@@ -41,61 +75,67 @@ if (!session || session.role !== 'admin') {
           </div>
         </div>
 
+        <!-- Mobile Drawer Header -->
+        <div class="p-4 border-b border-slate-800/80 flex md:hidden items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black flex items-center justify-center text-xs">
+              B
+            </div>
+            <span class="font-bold text-sm text-white">Menu Navigation</span>
+          </div>
+          <button id="close-drawer-btn" class="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900 border border-slate-800">
+            <X class="w-4 h-4" />
+          </button>
+        </div>
+
         <!-- Admin Nav Items -->
-        <nav class="p-3 space-y-1 text-xs font-semibold">
+        <nav class="p-3 space-y-1.5 text-xs font-semibold">
           <a
             href="/admin"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30 transition shadow-sm"
+            class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition shadow-sm ${
+              currentPath === '/admin' || currentPath === '/admin/'
+                ? 'bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
           >
-            <LayoutDashboard class="w-4 h-4 text-brand-400" />
+            <LayoutDashboard class={`w-4 h-4 ${currentPath === '/admin' || currentPath === '/admin/' ? 'text-brand-400' : 'text-slate-400'}`} />
             <span>Dashboard Overview</span>
           </a>
 
           <a
-            href="/admin#students"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition"
+            href="/admin/students"
+            class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
+              currentPath.startsWith('/admin/students')
+                ? 'bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
           >
-            <GraduationCap class="w-4 h-4 text-slate-400" />
+            <GraduationCap class={`w-4 h-4 ${currentPath.startsWith('/admin/students') ? 'text-brand-400' : 'text-slate-400'}`} />
             <span>Student Directory</span>
           </a>
 
           <a
-            href="/admin#teachers"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition"
+            href="/admin/teachers"
+            class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
+              currentPath.startsWith('/admin/teachers')
+                ? 'bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
           >
-            <Users class="w-4 h-4 text-slate-400" />
+            <Users class={`w-4 h-4 ${currentPath.startsWith('/admin/teachers') ? 'text-brand-400' : 'text-slate-400'}`} />
             <span>Faculty & Teachers</span>
           </a>
 
           <a
-            href="/admin#reports"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition"
+            href="/admin/reports"
+            class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
+              currentPath.startsWith('/admin/reports')
+                ? 'bg-brand-600/20 text-brand-300 font-bold border border-brand-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
           >
-            <BarChart3 class="w-4 h-4 text-slate-400" />
+            <BarChart3 class={`w-4 h-4 ${currentPath.startsWith('/admin/reports') ? 'text-brand-400' : 'text-slate-400'}`} />
             <span>Attendance Reports</span>
-          </a>
-
-          <a
-            href="/admin#audit"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition"
-          >
-            <ShieldCheck class="w-4 h-4 text-slate-400" />
-            <span>Audit & Security Logs</span>
-          </a>
-
-          <div class="pt-2 pb-1 px-3">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-600">Quick Links</span>
-          </div>
-
-          <a
-            href="/teacher"
-            class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition"
-          >
-            <span class="flex items-center gap-3">
-              <BookOpen class="w-4 h-4 text-slate-400" />
-              <span>Teacher Portal</span>
-            </span>
-            <ExternalLink class="w-3.5 h-3.5 text-slate-500" />
           </a>
         </nav>
       </div>
@@ -103,11 +143,11 @@ if (!session || session.role !== 'admin') {
       <!-- User Info & Logout -->
       <div class="p-4 border-t border-slate-800/80 bg-slate-950/60">
         <div class="flex items-center justify-between mb-3 px-1">
-          <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-xl bg-slate-800 text-slate-200 flex items-center justify-center font-bold text-xs">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-slate-800 text-slate-200 flex items-center justify-center font-bold text-xs border border-white/10">
               {session.name.charAt(0)}
             </div>
-            <div class="truncate max-w-[120px]">
+            <div class="truncate max-w-[130px]">
               <p class="text-xs font-bold text-white truncate">{session.name}</p>
               <p class="text-[10px] text-slate-400 truncate">Administrator</p>
             </div>
@@ -116,7 +156,7 @@ if (!session || session.role !== 'admin') {
 
         <button
           id="admin-logout-btn"
-          class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-600/80 border border-rose-500/20 transition-all duration-200 active:scale-95"
+          class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-600/80 border border-rose-500/20 transition-all duration-200 active:scale-95"
         >
           <LogOut class="w-3.5 h-3.5" />
           <span>Sign Out</span>
@@ -125,16 +165,64 @@ if (!session || session.role !== 'admin') {
     </aside>
 
     <!-- Main Admin Content Area -->
-    <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-slate-900 text-slate-100">
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-slate-900 text-slate-100 min-h-[calc(100vh-57px)] md:min-h-screen">
       <slot />
     </main>
   </div>
 
   <script>
+    // Mobile hamburger sidebar toggle handling
+    const toggleBtn = document.getElementById('mobile-sidebar-toggle');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+    const sidebar = document.getElementById('admin-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    const openIcon = document.getElementById('hamburger-open-icon');
+    const closeIcon = document.getElementById('hamburger-close-icon');
+
+    function openSidebar() {
+      if (!sidebar || !backdrop) return;
+      sidebar.classList.remove('-translate-x-full');
+      backdrop.classList.remove('hidden');
+      setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+      }, 10);
+      if (openIcon && closeIcon) {
+        openIcon.classList.add('hidden');
+        openIcon.classList.remove('block');
+        closeIcon.classList.remove('hidden');
+        closeIcon.classList.add('block');
+      }
+    }
+
+    function closeSidebar() {
+      if (!sidebar || !backdrop) return;
+      sidebar.classList.add('-translate-x-full');
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      setTimeout(() => {
+        backdrop.classList.add('hidden');
+      }, 300);
+      if (openIcon && closeIcon) {
+        openIcon.classList.remove('hidden');
+        openIcon.classList.add('block');
+        closeIcon.classList.add('hidden');
+        closeIcon.classList.remove('block');
+      }
+    }
+
+    toggleBtn?.addEventListener('click', () => {
+      const isOpen = !sidebar?.classList.contains('-translate-x-full');
+      if (isOpen) closeSidebar();
+      else openSidebar();
+    });
+
+    closeDrawerBtn?.addEventListener('click', closeSidebar);
+    backdrop?.addEventListener('click', closeSidebar);
+
     document.getElementById('admin-logout-btn')?.addEventListener('click', async () => {
       await fetch('/api/auth/logout', { method: 'POST' });
       window.location.href = '/login';
     });
   </script>
 </BaseLayout>
-
