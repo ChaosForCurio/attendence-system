@@ -52,10 +52,11 @@ export function calculateAttendanceStats(records: Array<{ status: string }>): At
 export function evaluateSessionStatus(
   startTime: string, // "09:00"
   endTime: string, // "09:15"
-  lateAfter?: string | null // "09:10"
+  lateAfter?: string | null, // "09:10"
+  currentTime?: string
 ): 'present' | 'late' | 'closed' {
   const now = new Date();
-  const currentHoursMinutes = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const currentHoursMinutes = currentTime || `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
   if (currentHoursMinutes > endTime) {
     return 'closed';

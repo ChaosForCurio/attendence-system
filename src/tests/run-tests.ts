@@ -65,7 +65,7 @@ async function runAllTests() {
 
   // Test Group 3: Session Window Evaluation Logic
   console.log('\n--- Test Group 3: Session Window & Status Evaluation ---');
-  const closedStatus = evaluateSessionStatus('08:00', '08:15', '08:10');
+  const closedStatus = evaluateSessionStatus('08:00', '08:15', '08:10', '08:20');
   assert(closedStatus === 'closed', 'Session evaluated as closed when current time is past end time');
 
   // Test Group 4: Dynamic QR Token Generation & Verification
