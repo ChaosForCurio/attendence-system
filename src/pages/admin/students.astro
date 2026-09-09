@@ -316,20 +316,15 @@ if (!session || session.role !== 'admin') {
         if (res.ok) {
           const data = await res.json();
           allStudents = data.students || [];
-          document.getElementById('stat-total-students')!.textContent = allStudents.length.toString();
-          renderStudents(allStudents);
         } else {
-          allStudents = [
-            { name: 'Rahul Kumar', studentNumber: 'BCA202601', email: 'student1@bhavyacomputerclasses.com', className: 'Batch 2026-A (Web & Python)', status: 'active' },
-            { name: 'Aman Sharma', studentNumber: 'BCA202602', email: 'student2@bhavyacomputerclasses.com', className: 'Batch 2026-A (Web & Python)', status: 'active' },
-            { name: 'Priya Verma', studentNumber: 'BCA202603', email: 'priya@bhavyacomputerclasses.com', className: 'Batch 2026-A (Web & Python)', status: 'active' }
-          ];
-          document.getElementById('stat-total-students')!.textContent = allStudents.length.toString();
-          renderStudents(allStudents);
+          allStudents = [];
         }
       } catch (err) {
         console.error('Failed to fetch students:', err);
+        allStudents = [];
       }
+      document.getElementById('stat-total-students')!.textContent = allStudents.length.toString();
+      renderStudents(allStudents);
     }
 
     function renderStudents(students: any[]) {
@@ -347,9 +342,9 @@ if (!session || session.role !== 'admin') {
             </div>
             <span>${s.name}</span>
           </td>
-          <td class="p-4 text-slate-600 font-mono text-xs">${s.studentNumber || 'BCA202601'}</td>
+          <td class="p-4 text-slate-600 font-mono text-xs">${s.studentNumber || '—'}</td>
           <td class="p-4 text-slate-500">${s.email}</td>
-          <td class="p-4 font-bold text-brand-600">${s.className || 'BCA 2A'}</td>
+          <td class="p-4 font-bold text-brand-600">${s.className || '—'}</td>
           <td class="p-4">
             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
               ${s.status || 'Active'}
@@ -358,7 +353,7 @@ if (!session || session.role !== 'admin') {
           <td class="p-4 text-right">
             <button
               type="button"
-              onclick="copyStudentCredentials('${s.name}', '${s.studentNumber || 'BCA202601'}', '${s.email}')"
+              onclick="copyStudentCredentials('${s.name}', '${s.studentNumber || '—'}', '${s.email}')"
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-700 border border-slate-200 text-[11px] font-semibold transition active:scale-95 cursor-pointer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>

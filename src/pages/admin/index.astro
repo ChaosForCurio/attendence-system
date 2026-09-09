@@ -47,12 +47,11 @@ if (!session || session.role !== 'admin') {
           <span>Attendance QR Center</span>
         </a>
         <a
-          href="/api/admin/reports?format=csv"
-          onclick="showToast('Exporting comprehensive attendance report...', 'success')"
-          class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-emerald-600/20 transition active:scale-95"
+          href="/admin/reports"
+          class="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-rose-600/20 transition active:scale-95"
         >
           <Download class="w-4 h-4" />
-          <span>Export CSV Report</span>
+          <span>Export PDF Report</span>
         </a>
       </div>
     </div>
@@ -109,8 +108,8 @@ if (!session || session.role !== 'admin') {
           </div>
         </div>
         <div>
-          <span id="metric-avg" class="block text-3xl font-black text-brand-600">89.4%</span>
-          <span class="text-[11px] text-emerald-600 font-bold">Above 75% target</span>
+          <span id="metric-avg" class="block text-3xl font-black text-brand-600">--</span>
+          <span class="text-[11px] text-slate-500 font-medium">Overall attendance rate</span>
         </div>
       </div>
     </div>
@@ -187,7 +186,7 @@ if (!session || session.role !== 'admin') {
           </div>
           <div>
             <h3 class="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition">Attendance Reports</h3>
-            <p class="text-xs text-slate-500 mt-1 font-medium">Analyze batch trends, view detailed attendance records, and export CSVs.</p>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Analyze batch trends, view detailed attendance records, and export PDF reports.</p>
           </div>
         </a>
       </div>
@@ -199,34 +198,10 @@ if (!session || session.role !== 'admin') {
       <div class="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4">
         <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
           <CheckCircle2 class="w-5 h-5 text-emerald-500" />
-          <span>Active Batches & Programs</span>
+          <span>Active Batches &amp; Programs</span>
         </h3>
-        <div class="space-y-3 text-xs">
-          <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-brand-100 text-brand-700 font-bold flex items-center justify-center">
-                BCA
-              </div>
-              <div>
-                <span class="font-bold text-slate-900 block">BCA 2A - Web & Python</span>
-                <span class="text-slate-500 text-[11px] font-medium">Morning Batch (9:00 AM - 12:00 PM)</span>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Active</span>
-          </div>
-
-          <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">
-                PGD
-              </div>
-              <div>
-                <span class="font-bold text-slate-900 block">PGDCA - Database Management</span>
-                <span class="text-slate-500 text-[11px] font-medium">Afternoon Batch (1:00 PM - 4:00 PM)</span>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Active</span>
-          </div>
+        <div id="active-batches-list" class="space-y-3 text-xs">
+          <p class="text-slate-400 text-center py-4 text-xs font-medium">Loading batches...</p>
         </div>
       </div>
 
@@ -252,78 +227,101 @@ if (!session || session.role !== 'admin') {
   <script>
     async function loadOverviewStats() {
       try {
-        const [stdRes, repRes] = await Promise.all([
+        const [stdRes, repRes, classRes] = await Promise.all([
           fetch('/api/admin/students'),
-          fetch('/api/admin/reports')
+          fetch('/api/admin/reports'),
+          fetch('/api/admin/classes'),
         ]);
 
+        // ── Students count ──────────────────────────────────────────────────
         if (stdRes.ok) {
           const { students } = await stdRes.json();
           const total = students ? students.length : 0;
           document.getElementById('metric-students')!.textContent = total.toString();
+        } else {
+          document.getElementById('metric-students')!.textContent = '0';
         }
+
+        // ── Reports / attendance stats ──────────────────────────────────────
+        const recentContainer = document.getElementById('overview-recent-records')!;
 
         if (repRes.ok) {
           const { reports } = await repRes.json();
-          const recentContainer = document.getElementById('overview-recent-records')!;
 
           if (reports && reports.length > 0) {
             const r = reports[0];
             const presentCount = reports.filter((rec: any) => rec.status === 'present').length;
-            const absentCount = reports.filter((rec: any) => rec.status === 'absent').length;
+            const absentCount  = reports.filter((rec: any) => rec.status === 'absent').length;
+            const total        = reports.length;
+            const rate         = total > 0 ? ((presentCount / total) * 100).toFixed(1) + '%' : '--';
 
             document.getElementById('metric-present')!.textContent = presentCount.toString();
-            document.getElementById('metric-absent')!.textContent = absentCount.toString();
+            document.getElementById('metric-absent')!.textContent  = absentCount.toString();
+            document.getElementById('metric-avg')!.textContent     = rate;
 
-            const timeStr = r.markedAt ? new Date(r.markedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : '08:17:32 AM';
-            const dateStr = r.date || '08 Sep 2026';
+            const timeStr = r.markedAt
+              ? new Date(r.markedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
+              : '--:--:-- --';
+            const dateStr = r.date || '--';
 
             recentContainer.innerHTML = `
               <div class="bg-slate-50 border-2 border-emerald-500/40 rounded-2xl p-5 font-mono text-xs space-y-2.5 shadow-sm relative overflow-hidden text-slate-800">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                  <span class="font-sans font-bold text-slate-500 uppercase text-[11px]">Attendance Records</span>
+                  <span class="font-sans font-bold text-slate-500 uppercase text-[11px]">Latest Attendance Record</span>
                   <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
                 </div>
                 <div class="space-y-1.5">
-                  <div class="flex justify-between"><span class="text-slate-500">Student:</span><span class="font-bold text-slate-900">${r.studentName || 'Rahul Kumar'}</span></div>
-                  <div class="flex justify-between"><span class="text-slate-500">Course:</span><span class="font-bold text-brand-600">${r.className || 'BCA'}</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Student:</span><span class="font-bold text-slate-900">${r.studentName || '—'}</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Course:</span><span class="font-bold text-brand-600">${r.className || '—'}</span></div>
                   <div class="flex justify-between"><span class="text-slate-500">Date:</span><span class="text-slate-700">${dateStr}</span></div>
                   <div class="flex justify-between"><span class="text-slate-500">Time:</span><span class="text-slate-700">${timeStr}</span></div>
                   <div class="flex justify-between pt-2 border-t border-slate-200 font-sans">
                     <span class="text-slate-500 font-bold">Status:</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
-                      PRESENT ✓
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black ${r.status === 'present' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'}">
+                      ${(r.status || 'present').toUpperCase()} ${r.status === 'present' ? '✓' : '✗'}
                     </span>
                   </div>
                 </div>
               </div>
             `;
           } else {
-            document.getElementById('metric-present')!.textContent = '1,102';
-            document.getElementById('metric-absent')!.textContent = '108';
+            document.getElementById('metric-present')!.textContent = '0';
+            document.getElementById('metric-absent')!.textContent  = '0';
+            document.getElementById('metric-avg')!.textContent     = '--';
+            recentContainer.innerHTML = '<p class="text-slate-400 text-center py-6 text-xs font-medium">No attendance records yet.</p>';
+          }
+        } else {
+          document.getElementById('metric-present')!.textContent = '0';
+          document.getElementById('metric-absent')!.textContent  = '0';
+          recentContainer.innerHTML = '<p class="text-slate-400 text-center py-6 text-xs font-medium">Could not load attendance data.</p>';
+        }
 
-            recentContainer.innerHTML = `
-              <div class="bg-slate-50 border-2 border-emerald-500/40 rounded-2xl p-5 font-mono text-xs space-y-2.5 shadow-sm relative overflow-hidden text-slate-800">
-                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                  <span class="font-sans font-bold text-slate-500 uppercase text-[11px]">Attendance Records</span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                </div>
-                <div class="space-y-1.5">
-                  <div class="flex justify-between"><span class="text-slate-500">Student:</span><span class="font-bold text-slate-900">Rahul Kumar</span></div>
-                  <div class="flex justify-between"><span class="text-slate-500">Course:</span><span class="font-bold text-brand-600">BCA</span></div>
-                  <div class="flex justify-between"><span class="text-slate-500">Date:</span><span class="text-slate-700">08 Sep 2026</span></div>
-                  <div class="flex justify-between"><span class="text-slate-500">Time:</span><span class="text-slate-700">08:17:32 AM</span></div>
-                  <div class="flex justify-between pt-2 border-t border-slate-200 font-sans">
-                    <span class="text-slate-500 font-bold">Status:</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
-                      PRESENT ✓
-                    </span>
+        // ── Active Batches ──────────────────────────────────────────────────
+        const batchList = document.getElementById('active-batches-list')!;
+        if (classRes.ok) {
+          const { classes } = await classRes.json();
+          if (classes && classes.length > 0) {
+            batchList.innerHTML = classes.map((c: any) => `
+              <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-xs">
+                    ${c.name.substring(0, 3).toUpperCase()}
+                  </div>
+                  <div>
+                    <span class="font-bold text-slate-900 block text-xs">${c.name}</span>
+                    <span class="text-slate-500 text-[11px] font-medium">${c.description || 'Active Batch'}</span>
                   </div>
                 </div>
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Active</span>
               </div>
-            `;
+            `).join('');
+          } else {
+            batchList.innerHTML = '<p class="text-slate-400 text-center py-4 text-xs font-medium">No classes configured yet.</p>';
           }
+        } else {
+          batchList.innerHTML = '<p class="text-slate-400 text-center py-4 text-xs font-medium">Could not load class data.</p>';
         }
+
       } catch (err) {
         console.error('Failed to load overview data:', err);
       }

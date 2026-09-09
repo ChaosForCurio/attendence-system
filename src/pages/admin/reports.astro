@@ -25,20 +25,20 @@ if (!session || session.role !== 'admin') {
         <div class="flex items-center gap-2.5">
           <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Attendance Reports</h1>
           <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80">
-            Analytics & Export
+            Analytics &amp; Export
           </span>
         </div>
-        <p class="text-xs text-slate-500 mt-1 font-medium">Review student attendance metrics, verification logs, and generate institutional CSV reports</p>
+        <p class="text-xs text-slate-500 mt-1 font-medium">Review student attendance metrics, verification logs, and generate institutional PDF reports</p>
       </div>
 
-      <a
-        href="/api/admin/reports?format=csv"
-        onclick="showToast('Downloading comprehensive attendance CSV...', 'success')"
-        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-emerald-600/20 transition active:scale-95 whitespace-nowrap cursor-pointer"
+      <button
+        id="export-pdf-btn"
+        onclick="downloadPDF()"
+        class="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-rose-600/20 transition active:scale-95 whitespace-nowrap cursor-pointer"
       >
         <Download class="w-4 h-4" />
-        <span>Export CSV Report</span>
-      </a>
+        <span>Export PDF Report</span>
+      </button>
     </div>
 
     <!-- Attendance Stats Bar -->
@@ -120,7 +120,7 @@ if (!session || session.role !== 'admin') {
               <th class="p-4">Time</th>
               <th class="p-4">Student Name</th>
               <th class="p-4">Student Roll No</th>
-              <th class="p-4">Class & Subject</th>
+              <th class="p-4">Class &amp; Subject</th>
               <th class="p-4">Status</th>
               <th class="p-4">Method</th>
             </tr>
@@ -136,6 +136,10 @@ if (!session || session.role !== 'admin') {
 
   </div>
 
+  <!-- jsPDF + AutoTable CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
   <script>
     let allReports: any[] = [];
 
@@ -145,36 +149,15 @@ if (!session || session.role !== 'admin') {
         if (res.ok) {
           const data = await res.json();
           allReports = data.reports || [];
-
-          if (allReports.length === 0) {
-            allReports = generateSampleReports();
-          }
-
-          updateReportStats(allReports);
-          renderReports(allReports);
         } else {
-          allReports = generateSampleReports();
-          updateReportStats(allReports);
-          renderReports(allReports);
+          allReports = [];
         }
       } catch (err) {
         console.error('Failed to load reports:', err);
-        allReports = generateSampleReports();
-        updateReportStats(allReports);
-        renderReports(allReports);
+        allReports = [];
       }
-    }
-
-    function generateSampleReports() {
-      const today = new Date().toISOString().split('T')[0];
-      const now = new Date();
-      const makeTime = (hOffset: number) => new Date(now.getTime() - hOffset * 60000).toISOString();
-      return [
-        { date: today, studentName: 'Rahul Kumar', studentNumber: 'BCA202601', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: makeTime(5) },
-        { date: today, studentName: 'Aman Sharma', studentNumber: 'BCA202602', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: makeTime(12) },
-        { date: today, studentName: 'Priya Verma', studentNumber: 'BCA202603', className: 'BCA 2A', subjectName: 'Web Development', status: 'absent', method: 'manual', markedAt: makeTime(20) },
-        { date: today, studentName: 'Vikram Singh', studentNumber: 'BCA202604', className: 'BCA 2A', subjectName: 'Web Development', status: 'present', method: 'qr', markedAt: makeTime(8) }
-      ];
+      updateReportStats(allReports);
+      renderReports(allReports);
     }
 
     function updateReportStats(reports: any[]) {
@@ -226,7 +209,224 @@ if (!session || session.role !== 'admin') {
       `}).join('');
     }
 
-    // Filter handling
+    // ─── PDF Export ─────────────────────────────────────────────────────────────
+    async function downloadPDF() {
+      const btn = document.getElementById('export-pdf-btn') as HTMLButtonElement;
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg><span>Generating PDF...</span>';
+      btn.disabled = true;
+
+      try {
+        // Fetch fresh data from API
+        let reports: any[] = allReports;
+        try {
+          const res = await fetch('/api/admin/reports');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.reports && data.reports.length > 0) reports = data.reports;
+          }
+        } catch (_) { /* use cached allReports */ }
+
+        // Ensure jsPDF is loaded
+        const { jsPDF } = (window as any).jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const margin = 14;
+        const now = new Date();
+        const generatedAt = now.toLocaleString('en-IN', {
+          day: '2-digit', month: 'long', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', hour12: true
+        });
+
+        // ── Header bar ──────────────────────────────────────────────────────────
+        doc.setFillColor(30, 41, 59);           // slate-800
+        doc.rect(0, 0, pageW, 22, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Bhavya Computer Classes', margin, 10);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Attendance Management System', margin, 16);
+
+        // Report title (right-aligned)
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ATTENDANCE REPORT', pageW - margin, 10, { align: 'right' });
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Generated: ${generatedAt}`, pageW - margin, 16, { align: 'right' });
+
+        // ── Summary stats row ────────────────────────────────────────────────────
+        const total   = reports.length;
+        const present = reports.filter((r: any) => r.status === 'present').length;
+        const absent  = reports.filter((r: any) => r.status === 'absent').length;
+        const rate    = total > 0 ? ((present / total) * 100).toFixed(1) : '0.0';
+
+        const statsY = 28;
+        const statBoxW = (pageW - margin * 2 - 9) / 4;
+        const statBoxH = 18;
+
+        const stats = [
+          { label: 'Total Logs',      value: total.toString(),   color: [79, 70, 229] as [number,number,number] },   // indigo
+          { label: 'Present',         value: present.toString(), color: [5, 150, 105] as [number,number,number] },   // emerald
+          { label: 'Absent',          value: absent.toString(),  color: [220, 38, 38] as [number,number,number] },   // red
+          { label: 'Attendance Rate', value: `${rate}%`,         color: [124, 58, 237] as [number,number,number] },  // violet
+        ];
+
+        stats.forEach((s, i) => {
+          const x = margin + i * (statBoxW + 3);
+          // Card background
+          doc.setFillColor(248, 250, 252);        // slate-50
+          doc.setDrawColor(226, 232, 240);        // slate-200
+          doc.roundedRect(x, statsY, statBoxW, statBoxH, 2, 2, 'FD');
+
+          // Accent left strip
+          doc.setFillColor(...s.color);
+          doc.roundedRect(x, statsY, 3, statBoxH, 1, 1, 'F');
+
+          // Label
+          doc.setTextColor(100, 116, 139);       // slate-500
+          doc.setFontSize(6.5);
+          doc.setFont('helvetica', 'bold');
+          doc.text(s.label.toUpperCase(), x + 6, statsY + 6);
+
+          // Value
+          doc.setTextColor(...s.color);
+          doc.setFontSize(14);
+          doc.setFont('helvetica', 'bold');
+          doc.text(s.value, x + 6, statsY + 15);
+        });
+
+        // ── Section divider ──────────────────────────────────────────────────────
+        const tableStartY = statsY + statBoxH + 6;
+        doc.setTextColor(51, 65, 85);            // slate-700
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('DETAILED ATTENDANCE LOG', margin, tableStartY);
+        doc.setDrawColor(203, 213, 225);         // slate-300
+        doc.setLineWidth(0.3);
+        doc.line(margin + 60, tableStartY - 1, pageW - margin, tableStartY - 1);
+
+        // ── Main data table ─────────────────────────────────────────────────────
+        const tableRows = reports.map((r: any) => {
+          const timeStr = r.markedAt
+            ? new Date(r.markedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
+            : '--:--';
+          return [
+            r.date || '—',
+            timeStr,
+            r.studentName || '—',
+            r.studentNumber || '—',
+            `${r.className || '—'}\n${r.subjectName || 'General'}`,
+            (r.status || 'present').toUpperCase(),
+            (r.method || 'QR').toUpperCase(),
+          ];
+        });
+
+        (doc as any).autoTable({
+          startY: tableStartY + 3,
+          margin: { left: margin, right: margin },
+          head: [['Date', 'Time', 'Student Name', 'Roll No', 'Class / Subject', 'Status', 'Method']],
+          body: tableRows,
+          styles: {
+            fontSize: 8,
+            cellPadding: { top: 3, right: 4, bottom: 3, left: 4 },
+            font: 'helvetica',
+            textColor: [30, 41, 59],
+            lineColor: [226, 232, 240],
+            lineWidth: 0.3,
+          },
+          headStyles: {
+            fillColor: [30, 41, 59],             // slate-800
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            fontSize: 7.5,
+            halign: 'center',
+          },
+          alternateRowStyles: {
+            fillColor: [248, 250, 252],          // slate-50
+          },
+          columnStyles: {
+            0: { cellWidth: 24, halign: 'center', fontStyle: 'normal', textColor: [100, 116, 139] },  // Date
+            1: { cellWidth: 20, halign: 'center', textColor: [100, 116, 139] },                        // Time
+            2: { cellWidth: 44, fontStyle: 'bold' },                                                   // Name
+            3: { cellWidth: 28, halign: 'center', fontStyle: 'normal', textColor: [100, 116, 139] },  // Roll No
+            4: { cellWidth: 'auto' },                                                                  // Class/Subject
+            5: { cellWidth: 22, halign: 'center' },                                                   // Status
+            6: { cellWidth: 20, halign: 'center', textColor: [100, 116, 139] },                       // Method
+          },
+          didDrawCell: (hookData: any) => {
+            // Colour the Status cell
+            if (hookData.section === 'body' && hookData.column.index === 5) {
+              const val = hookData.cell.raw as string;
+              const isPresent = val === 'PRESENT';
+              const { x, y, width, height } = hookData.cell;
+              const pad = 2;
+              const bw = width - pad * 2;
+              const bh = height - pad * 2;
+
+              doc.setFillColor(isPresent ? 209 : 254, isPresent ? 250 : 202, isPresent ? 229 : 202);
+              doc.setDrawColor(isPresent ? 16 : 220, isPresent ? 185 : 38, isPresent ? 129 : 38);
+              doc.setLineWidth(0.3);
+              doc.roundedRect(x + pad, y + pad, bw, bh, 2, 2, 'FD');
+
+              doc.setTextColor(isPresent ? 5 : 153, isPresent ? 121 : 27, isPresent ? 56 : 27);
+              doc.setFontSize(7);
+              doc.setFont('helvetica', 'bold');
+              doc.text(val, x + width / 2, y + height / 2 + 1, { align: 'center' });
+            }
+          },
+          // Page numbers in footer
+          didDrawPage: (hookData: any) => {
+            const pageCount = doc.internal.pages.length - 1;
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(148, 163, 184);    // slate-400
+
+            // Left footer
+            doc.text('Bhavya Computer Classes — Confidential', margin, pageH - 6);
+            // Right footer: page number
+            doc.text(
+              `Page ${hookData.pageNumber} of ${pageCount}`,
+              pageW - margin,
+              pageH - 6,
+              { align: 'right' }
+            );
+
+            // Footer line
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.3);
+            doc.line(margin, pageH - 10, pageW - margin, pageH - 10);
+          },
+        });
+
+        // Save the PDF
+        const filename = `attendance_report_${now.toISOString().split('T')[0]}.pdf`;
+        doc.save(filename);
+
+        if (typeof (window as any).showToast === 'function') {
+          (window as any).showToast('PDF report downloaded successfully!', 'success');
+        }
+      } catch (err) {
+        console.error('PDF generation failed:', err);
+        if (typeof (window as any).showToast === 'function') {
+          (window as any).showToast('Failed to generate PDF. Please try again.', 'error');
+        }
+      } finally {
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+      }
+    }
+
+    // Expose to window so the inline onclick can call it
+    (window as any).downloadPDF = downloadPDF;
+
+    // ─── Filter handling ─────────────────────────────────────────────────────────
     const searchInput = document.getElementById('reports-search-input') as HTMLInputElement;
     const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
 
