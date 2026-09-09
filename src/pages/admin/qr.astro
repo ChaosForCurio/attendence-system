@@ -13,61 +13,61 @@ if (!session || session.role !== 'admin') {
   <div class="max-w-4xl mx-auto space-y-8 pb-12">
     
     <!-- Top Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
       <div>
         <div class="flex items-center gap-2.5">
-          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Attendance QR Manager</h1>
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Attendance QR Manager</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-200/80">
             Realtime QR Invalidation
           </span>
         </div>
-        <p class="text-xs text-slate-400 mt-1">Generate unique, secure session QR tokens per class. Old tokens terminate automatically upon regeneration.</p>
+        <p class="text-xs text-slate-500 mt-1 font-medium">Generate unique, secure session QR tokens per class. Old tokens terminate automatically upon regeneration.</p>
       </div>
 
       <div class="flex items-center gap-3">
         <button
           id="toggle-fullscreen-top-btn"
-          class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-white/10 transition active:scale-95 shadow-md"
+          class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-200/80 transition active:scale-95 shadow-sm"
         >
-          <Maximize2 class="w-4 h-4 text-brand-400" />
+          <Maximize2 class="w-4 h-4 text-brand-600" />
           <span>Fullscreen Mode</span>
         </button>
       </div>
     </div>
 
     <!-- CLASS / COURSE SELECTOR -->
-    <div class="bg-slate-950/80 border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-glass-dark">
-      <div class="flex items-center gap-2 text-brand-400">
+    <div class="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-sm">
+      <div class="flex items-center gap-2 text-brand-600">
         <Layers class="w-5 h-5" />
-        <span class="text-sm font-bold text-white">Select Class / Course</span>
+        <span class="text-sm font-bold text-slate-900">Select Class / Course</span>
       </div>
       <div class="relative flex-1 max-w-xs">
         <select
           id="class-selector"
-          class="w-full px-4 py-2.5 pr-10 rounded-xl bg-slate-900 border border-white/10 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 appearance-none cursor-pointer"
+          class="w-full px-4 py-2.5 pr-10 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 appearance-none cursor-pointer"
         >
           <option value="" disabled selected>Loading classes...</option>
         </select>
         <ChevronDown class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
       </div>
-      <p class="text-[11px] text-slate-400">QR tokens are isolated per class. Regenerating one class does not affect others.</p>
+      <p class="text-[11px] text-slate-500 font-medium">QR tokens are isolated per class. Regenerating one class does not affect others.</p>
     </div>
 
     <!-- MAIN ATTENDANCE QR DISPLAY CARD -->
     <div class="flex justify-center">
       <div
         id="qr-main-card"
-        class="w-full max-w-md bg-slate-950 border-2 border-emerald-500/40 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden text-center transition-all duration-300"
+        class="w-full max-w-md bg-white border-2 border-emerald-500/40 rounded-3xl p-6 sm:p-8 space-y-6 shadow-lg relative overflow-hidden text-center transition-all duration-300"
       >
         <!-- Top Card Title -->
         <div class="space-y-1">
           <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 font-mono block">INSTITUTIONAL QR PORTAL</span>
-          <h2 id="qr-card-class-name" class="text-xl font-black text-white tracking-wide uppercase border-b border-white/10 pb-3">ATTENDANCE QR</h2>
+          <h2 id="qr-card-class-name" class="text-xl font-black text-slate-900 tracking-wide uppercase border-b border-slate-200/80 pb-3">ATTENDANCE QR</h2>
         </div>
 
         <!-- Dynamic QR Display Container — real scannable PNG -->
         <div class="relative group my-2 flex justify-center">
-          <div class="p-4 bg-white rounded-3xl border-4 border-slate-800 shadow-inner flex items-center justify-center w-64 h-64 relative">
+          <div class="p-4 bg-white rounded-3xl border-4 border-slate-200 shadow-inner flex items-center justify-center w-64 h-64 relative">
             <!-- Real QR image rendered by API -->
             <img
               id="qr-image"
@@ -88,25 +88,25 @@ if (!session || session.role !== 'admin') {
         </div>
 
         <!-- Scan URL hint -->
-        <div id="scan-url-display" class="hidden text-[11px] font-mono text-brand-400 truncate px-1">
+        <div id="scan-url-display" class="hidden text-[11px] font-mono text-brand-600 truncate px-1 font-semibold">
           Scan URL: <span id="scan-url-text"></span>
         </div>
 
         <!-- Session Meta Details -->
-        <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-2 text-xs font-mono">
-          <div class="flex items-center justify-between text-slate-300">
-            <span class="text-slate-400 font-sans font-semibold">Session:</span>
-            <span id="qr-session-code" class="font-bold text-brand-400 text-sm">#ATT-2026-091</span>
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2 text-xs font-mono">
+          <div class="flex items-center justify-between text-slate-700">
+            <span class="text-slate-500 font-sans font-semibold">Session:</span>
+            <span id="qr-session-code" class="font-bold text-brand-600 text-sm">#ATT-2026-091</span>
           </div>
 
-          <div class="flex items-center justify-between text-slate-300">
-            <span class="text-slate-400 font-sans font-semibold">Generated:</span>
-            <span id="qr-generated-time" class="font-bold text-white">--:-- --</span>
+          <div class="flex items-center justify-between text-slate-700">
+            <span class="text-slate-500 font-sans font-semibold">Generated:</span>
+            <span id="qr-generated-time" class="font-bold text-slate-900">--:-- --</span>
           </div>
 
-          <div class="flex items-center justify-between pt-2 border-t border-white/10">
-            <span class="text-slate-400 font-sans font-semibold">Status:</span>
-            <div id="qr-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-slate-700/50 text-slate-400 border border-slate-600/40">
+          <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+            <span class="text-slate-500 font-sans font-semibold">Status:</span>
+            <div id="qr-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-slate-200/70 text-slate-600 border border-slate-300/60">
               <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
               <span>NOT ACTIVE</span>
             </div>
@@ -116,14 +116,14 @@ if (!session || session.role !== 'admin') {
         <!-- Primary Action Button: GENERATE NEW QR -->
         <button
           id="generate-new-qr-btn"
-          class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 active:from-brand-700 active:to-indigo-700 text-white font-extrabold text-sm transition shadow-xl shadow-brand-600/30 flex items-center justify-center gap-2.5 active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 active:from-brand-700 active:to-indigo-700 text-white font-extrabold text-sm transition shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2.5 active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           disabled
         >
           <RefreshCw class="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
           <span>GENERATE NEW QR</span>
         </button>
 
-        <p class="text-[11px] text-slate-400 font-medium italic">
+        <p class="text-[11px] text-slate-500 font-medium italic">
           Clicking generates a new unique QR code for the selected class. The previous QR code will immediately terminate.
         </p>
 
@@ -131,43 +131,43 @@ if (!session || session.role !== 'admin') {
     </div>
 
     <!-- LIFECYCLE AUDIT STATUS PANEL -->
-    <div class="bg-slate-950 border border-white/10 rounded-3xl p-6 space-y-4 shadow-glass-dark">
-      <h3 class="text-sm font-bold text-white flex items-center gap-2">
-        <Layers class="w-4 h-4 text-brand-400" />
+    <div class="bg-white border border-slate-200/80 rounded-3xl p-6 space-y-4 shadow-sm">
+      <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <Layers class="w-4 h-4 text-brand-600" />
         <span>QR Token Lifecycle &amp; Invalidation Status</span>
       </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
         <!-- Old QR Termination Card -->
-        <div class="p-4 rounded-2xl bg-slate-900 border border-rose-500/30 space-y-2">
-          <div class="flex items-center justify-between text-rose-400 font-bold font-sans">
+        <div class="p-4 rounded-2xl bg-rose-50/60 border border-rose-200 space-y-2">
+          <div class="flex items-center justify-between text-rose-700 font-bold font-sans">
             <span class="flex items-center gap-1.5">
               <XCircle class="w-4 h-4" />
               OLD QR TOKEN
             </span>
-            <span class="px-2 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-[10px]">❌ TERMINATED</span>
+            <span class="px-2 py-0.5 rounded bg-rose-100 border border-rose-300 text-[10px] font-extrabold">❌ TERMINATED</span>
           </div>
-          <p id="old-token-display" class="text-slate-400 text-[11px] truncate">
+          <p id="old-token-display" class="text-rose-900 text-[11px] truncate font-medium">
             Previous token: None terminated yet in this session
           </p>
-          <p class="text-[10px] text-slate-400 font-sans">
-            Any student scanning this old QR code will receive an error: <strong class="text-rose-300">"QR Code Terminated"</strong>.
+          <p class="text-[10px] text-rose-700/90 font-sans">
+            Any student scanning this old QR code will receive an error: <strong class="text-rose-900">"QR Code Terminated"</strong>.
           </p>
         </div>
 
         <!-- New QR Active Card -->
-        <div class="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-2">
-          <div class="flex items-center justify-between text-emerald-400 font-bold font-sans">
+        <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+          <div class="flex items-center justify-between text-emerald-700 font-bold font-sans">
             <span class="flex items-center gap-1.5">
               <CheckCircle2 class="w-4 h-4" />
               NEW QR TOKEN
             </span>
-            <span class="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-[10px]">🟢 ACTIVE</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 border border-emerald-300 text-[10px] font-extrabold">🟢 ACTIVE</span>
           </div>
-          <p id="new-token-display" class="text-emerald-300 text-[11px] truncate font-bold">
+          <p id="new-token-display" class="text-emerald-900 text-[11px] truncate font-bold">
             Token: Generate a QR above to activate
           </p>
-          <p class="text-[10px] text-slate-400 font-sans">
+          <p class="text-[10px] text-emerald-700/90 font-sans">
             Only scans matching this active token will authenticate and mark student attendance.
           </p>
         </div>
@@ -177,10 +177,10 @@ if (!session || session.role !== 'admin') {
   </div>
 
   <!-- FULLSCREEN MODAL OVERLAY FOR CLASSROOM PROJECTOR -->
-  <div id="fullscreen-overlay" class="fixed inset-0 bg-slate-950 z-50 hidden flex flex-col items-center justify-center p-6 space-y-6 select-none">
+  <div id="fullscreen-overlay" class="fixed inset-0 bg-slate-900 z-50 hidden flex flex-col items-center justify-center p-6 space-y-6 select-none">
     <button
       id="exit-fullscreen-btn"
-      class="absolute top-6 right-6 inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-white/10 text-white font-bold text-xs px-4 py-2 rounded-xl transition"
+      class="absolute top-6 right-6 inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition"
     >
       <Minimize2 class="w-4 h-4 text-rose-400" />
       <span>Exit Fullscreen</span>
@@ -210,7 +210,7 @@ if (!session || session.role !== 'admin') {
       </div>
     </div>
 
-    <div class="flex items-center gap-6 font-mono text-sm bg-slate-900 border border-white/10 px-6 py-3 rounded-2xl">
+    <div class="flex items-center gap-6 font-mono text-sm bg-slate-900 border border-slate-800 px-6 py-3 rounded-2xl">
       <div class="flex items-center gap-2">
         <span class="text-slate-400">Session:</span>
         <span id="fullscreen-session" class="font-bold text-brand-400">#ATT-2026-091</span>
@@ -227,7 +227,7 @@ if (!session || session.role !== 'admin') {
 
     <button
       id="fullscreen-gen-btn"
-      class="px-8 py-4 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-black text-base shadow-2xl transition active:scale-95 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="px-8 py-4 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-black text-base shadow-2xl transition active:scale-95 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       disabled
     >
       <RefreshCw class="w-5 h-5" />

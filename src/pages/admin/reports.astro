@@ -20,21 +20,21 @@ if (!session || session.role !== 'admin') {
   <div class="space-y-6">
     
     <!-- Top Bar Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
       <div>
         <div class="flex items-center gap-2.5">
-          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Attendance Reports</h1>
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Attendance Reports</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80">
             Analytics & Export
           </span>
         </div>
-        <p class="text-xs text-slate-400 mt-1">Review student attendance metrics, verification logs, and generate institutional CSV reports</p>
+        <p class="text-xs text-slate-500 mt-1 font-medium">Review student attendance metrics, verification logs, and generate institutional CSV reports</p>
       </div>
 
       <a
         href="/api/admin/reports?format=csv"
         onclick="showToast('Downloading comprehensive attendance CSV...', 'success')"
-        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 transition active:scale-95 whitespace-nowrap"
+        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-emerald-600/20 transition active:scale-95 whitespace-nowrap cursor-pointer"
       >
         <Download class="w-4 h-4" />
         <span>Export CSV Report</span>
@@ -43,66 +43,66 @@ if (!session || session.role !== 'admin') {
 
     <!-- Attendance Stats Bar -->
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Logs Recorded</span>
-          <span id="stat-total-logs" class="text-2xl font-black text-white">0</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Logs Recorded</span>
+          <span id="stat-total-logs" class="text-2xl font-black text-slate-900">0</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400">
+        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
           <BarChart3 class="w-5 h-5" />
         </div>
       </div>
 
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Present Count</span>
-          <span id="stat-present-count" class="text-2xl font-black text-emerald-400">0</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Present Count</span>
+          <span id="stat-present-count" class="text-2xl font-black text-emerald-600">0</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
+        <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
           <UserCheck class="w-5 h-5" />
         </div>
       </div>
 
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Absent Count</span>
-          <span id="stat-absent-count" class="text-2xl font-black text-rose-400">0</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Absent Count</span>
+          <span id="stat-absent-count" class="text-2xl font-black text-rose-600">0</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-rose-500/20 text-rose-400">
+        <div class="p-2.5 rounded-xl bg-rose-50 text-rose-600">
           <UserX class="w-5 h-5" />
         </div>
       </div>
 
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Attendance Rate</span>
-          <span id="stat-rate" class="text-2xl font-black text-brand-400">--%</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Attendance Rate</span>
+          <span id="stat-rate" class="text-2xl font-black text-brand-600">--%</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-brand-500/20 text-brand-400">
+        <div class="p-2.5 rounded-xl bg-brand-50 text-brand-600">
           <Sparkles class="w-5 h-5" />
         </div>
       </div>
     </div>
 
     <!-- Filter Controls & Report Table -->
-    <div class="bg-slate-950/80 rounded-3xl p-4 sm:p-6 border border-white/10 shadow-glass-dark space-y-4">
+    <div class="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-4">
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div class="relative flex-1">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <Search class="w-4 h-4" />
           </div>
           <input
             type="text"
             id="reports-search-input"
             placeholder="Search by student name, ID, class, or subject..."
-            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
           />
         </div>
 
         <div class="flex items-center gap-2">
           <select
             id="status-filter"
-            class="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+            class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
           >
             <option value="all">All Statuses</option>
             <option value="present">Present Only</option>
@@ -112,9 +112,9 @@ if (!session || session.role !== 'admin') {
       </div>
 
       <!-- Report Table -->
-      <div class="overflow-x-auto rounded-2xl border border-white/5">
+      <div class="overflow-x-auto rounded-2xl border border-slate-200/80">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-900 text-slate-400 uppercase font-bold tracking-wider border-b border-white/10">
+          <thead class="bg-slate-100/80 text-slate-700 uppercase font-bold tracking-wider border-b border-slate-200">
             <tr>
               <th class="p-4">Date</th>
               <th class="p-4">Time</th>
@@ -125,7 +125,7 @@ if (!session || session.role !== 'admin') {
               <th class="p-4">Method</th>
             </tr>
           </thead>
-          <tbody id="reports-table-body" class="divide-y divide-white/5 font-medium">
+          <tbody id="reports-table-body" class="divide-y divide-slate-200/60 font-medium">
             <tr>
               <td colspan="7" class="p-6 text-center text-slate-400">Loading attendance reports...</td>
             </tr>
@@ -192,7 +192,7 @@ if (!session || session.role !== 'admin') {
     function renderReports(reports: any[]) {
       const tbody = document.getElementById('reports-table-body')!;
       if (reports.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">No attendance logs found matching filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500 font-medium">No attendance logs found matching filters.</td></tr>';
         return;
       }
 
@@ -203,22 +203,22 @@ if (!session || session.role !== 'admin') {
           : '--:-- --';
 
         return `
-        <tr class="hover:bg-slate-900/50 transition">
-          <td class="p-4 text-slate-400 font-mono">${r.date || 'Today'}</td>
-          <td class="p-4 text-slate-300 font-mono whitespace-nowrap">${markedAtTime}</td>
-          <td class="p-4 font-bold text-white">${r.studentName}</td>
-          <td class="p-4 text-slate-300 font-mono">${r.studentNumber}</td>
-          <td class="p-4 text-slate-300">
-            <span class="font-bold text-white block">${r.className}</span>
-            <span class="text-[10px] text-brand-400">${r.subjectName || 'General'}</span>
+        <tr class="hover:bg-slate-50/80 transition text-slate-900">
+          <td class="p-4 text-slate-500 font-mono text-xs">${r.date || 'Today'}</td>
+          <td class="p-4 text-slate-600 font-mono text-xs whitespace-nowrap">${markedAtTime}</td>
+          <td class="p-4 font-bold text-slate-900">${r.studentName}</td>
+          <td class="p-4 text-slate-600 font-mono text-xs">${r.studentNumber}</td>
+          <td class="p-4 text-slate-700 font-medium">
+            <span class="font-bold text-slate-900 block">${r.className}</span>
+            <span class="text-[10px] text-brand-600 font-bold">${r.subjectName || 'General'}</span>
           </td>
           <td class="p-4">
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${r.status === 'present' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${r.status === 'present' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'}">
               ${r.status ? r.status.toUpperCase() : 'PRESENT'}
             </span>
           </td>
           <td class="p-4">
-            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900 text-slate-400 border border-white/10 uppercase">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200 uppercase font-bold">
               ${r.method || 'QR'}
             </span>
           </td>

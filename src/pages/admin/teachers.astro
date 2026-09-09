@@ -19,20 +19,20 @@ if (!session || session.role !== 'admin') {
   <div class="space-y-6">
     
     <!-- Top Bar Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
       <div>
         <div class="flex items-center gap-2.5">
-          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Faculty & Teachers</h1>
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Faculty & Teachers</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
             Teaching Staff
           </span>
         </div>
-        <p class="text-xs text-slate-400 mt-1">Manage instructor credentials, subject assignments, and session authority</p>
+        <p class="text-xs text-slate-500 mt-1 font-medium">Manage instructor credentials, subject assignments, and session authority</p>
       </div>
 
       <button
         id="open-add-teacher-modal"
-        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 transition active:scale-95 whitespace-nowrap"
+        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-emerald-600/20 transition active:scale-95 whitespace-nowrap cursor-pointer"
       >
         <Plus class="w-4 h-4" />
         <span>Add Faculty Member</span>
@@ -41,57 +41,57 @@ if (!session || session.role !== 'admin') {
 
     <!-- Faculty Stats Bar -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Faculty</span>
-          <span id="stat-total-teachers" class="text-2xl font-black text-white">0</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Faculty</span>
+          <span id="stat-total-teachers" class="text-2xl font-black text-slate-900">0</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
+        <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
           <Users class="w-5 h-5" />
         </div>
       </div>
 
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Modules</span>
-          <span class="text-2xl font-black text-brand-400">Web Dev, Python, DB</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Assigned Modules</span>
+          <span class="text-2xl font-black text-brand-600">Web Dev, Python, DB</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-brand-500/20 text-brand-400">
+        <div class="p-2.5 rounded-xl bg-brand-50 text-brand-600">
           <BookOpen class="w-5 h-5" />
         </div>
       </div>
 
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex items-center justify-between">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">QR Session Access</span>
-          <span class="text-2xl font-black text-emerald-400">Authorized</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">QR Session Access</span>
+          <span class="text-2xl font-black text-emerald-600">Authorized</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400">
+        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
           <Shield class="w-5 h-5" />
         </div>
       </div>
     </div>
 
     <!-- Controls Bar & Table -->
-    <div class="bg-slate-950/80 rounded-3xl p-4 sm:p-6 border border-white/10 shadow-glass-dark space-y-4">
+    <div class="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-4">
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div class="relative flex-1">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <Search class="w-4 h-4" />
           </div>
           <input
             type="text"
             id="teacher-search-input"
             placeholder="Search faculty by name or email address..."
-            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition font-medium"
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition font-medium"
           />
         </div>
       </div>
 
       <!-- Faculty Table -->
-      <div class="overflow-x-auto rounded-2xl border border-white/5">
+      <div class="overflow-x-auto rounded-2xl border border-slate-200/80">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-900 text-slate-400 uppercase font-bold tracking-wider border-b border-white/10">
+          <thead class="bg-slate-100/80 text-slate-700 uppercase font-bold tracking-wider border-b border-slate-200">
             <tr>
               <th class="p-4">Faculty Name</th>
               <th class="p-4">Email Address</th>
@@ -99,7 +99,7 @@ if (!session || session.role !== 'admin') {
               <th class="p-4">Status</th>
             </tr>
           </thead>
-          <tbody id="teacher-table-body" class="divide-y divide-white/5 font-medium">
+          <tbody id="teacher-table-body" class="divide-y divide-slate-200/60 font-medium">
             <tr>
               <td colspan="4" class="p-6 text-center text-slate-400">Loading faculty list...</td>
             </tr>
@@ -111,30 +111,30 @@ if (!session || session.role !== 'admin') {
   </div>
 
   <!-- Add Teacher Modal -->
-  <div id="teacher-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-white/10 rounded-3xl p-6 max-w-md w-full text-white space-y-4 shadow-2xl relative">
-      <button id="close-teacher-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold p-1">✕</button>
+  <div id="teacher-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200/80 rounded-3xl p-6 max-w-md w-full text-slate-900 space-y-4 shadow-2xl relative">
+      <button id="close-teacher-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold p-1">✕</button>
       
       <div>
         <h3 class="text-lg font-bold">Add Faculty Member</h3>
-        <p class="text-xs text-slate-400">Create instructor account and session authorization credentials</p>
+        <p class="text-xs text-slate-500 font-medium">Create instructor account and session authorization credentials</p>
       </div>
 
       <form id="add-teacher-form" class="space-y-3.5 text-xs">
         <div>
-          <label class="block text-slate-300 font-semibold mb-1">Full Name</label>
-          <input type="text" id="new-tch-name" required placeholder="e.g. Mr. Sharma" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          <label class="block text-slate-700 font-semibold mb-1">Full Name</label>
+          <input type="text" id="new-tch-name" required placeholder="e.g. Mr. Sharma" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
         </div>
         <div>
-          <label class="block text-slate-300 font-semibold mb-1">Email Address</label>
-          <input type="email" id="new-tch-email" required placeholder="teacher@bhavyacomputerclasses.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          <label class="block text-slate-700 font-semibold mb-1">Email Address</label>
+          <input type="email" id="new-tch-email" required placeholder="teacher@bhavyacomputerclasses.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
         </div>
         <div>
-          <label class="block text-slate-300 font-semibold mb-1">Default Password</label>
-          <input type="password" id="new-tch-pass" required value="TeacherPass123!" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          <label class="block text-slate-700 font-semibold mb-1">Default Password</label>
+          <input type="password" id="new-tch-pass" required value="TeacherPass123!" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
         </div>
 
-        <button type="submit" id="submit-teacher-btn" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold transition mt-3 shadow-lg shadow-emerald-600/20">
+        <button type="submit" id="submit-teacher-btn" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold transition mt-3 shadow-md shadow-emerald-600/20 cursor-pointer">
           Create Faculty Account
         </button>
       </form>
@@ -167,22 +167,22 @@ if (!session || session.role !== 'admin') {
     function renderTeachers(teachers: any[]) {
       const tbody = document.getElementById('teacher-table-body')!;
       if (teachers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-500">No faculty members found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-500 font-medium">No faculty members found.</td></tr>';
         return;
       }
 
       tbody.innerHTML = teachers.map((t: any) => `
-        <tr class="hover:bg-slate-900/50 transition">
-          <td class="p-4 font-bold text-white flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs">
+        <tr class="hover:bg-slate-50/80 transition text-slate-900">
+          <td class="p-4 font-bold flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs">
               ${t.name.charAt(0)}
             </div>
             <span>${t.name}</span>
           </td>
-          <td class="p-4 text-slate-400">${t.email}</td>
-          <td class="p-4 text-slate-300 font-medium">BCA 2A (Web Dev, Python, Data Science)</td>
+          <td class="p-4 text-slate-500">${t.email}</td>
+          <td class="p-4 text-slate-700 font-medium">BCA 2A (Web Dev, Python, Data Science)</td>
           <td class="p-4">
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
               Active Faculty
             </span>
           </td>

@@ -26,21 +26,22 @@ if (!session || session.role !== 'admin') {
   <div class="space-y-8">
     
     <!-- Top Bar Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
       <div>
         <div class="flex items-center gap-2.5">
-          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Admin Command Center</h1>
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Admin Command Center</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             System Live
           </span>
         </div>
-        <p class="text-xs text-slate-400 mt-1">Institution Attendance & Portal Performance Overview</p>
+        <p class="text-xs text-slate-500 mt-1 font-medium">Institution Attendance & Portal Performance Overview</p>
       </div>
 
       <div class="flex items-center gap-3">
         <a
           href="/admin/qr"
-          class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition active:scale-95"
+          class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-95"
         >
           <QrCode class="w-4 h-4" />
           <span>Attendance QR Center</span>
@@ -48,7 +49,7 @@ if (!session || session.role !== 'admin') {
         <a
           href="/api/admin/reports?format=csv"
           onclick="showToast('Exporting comprehensive attendance report...', 'success')"
-          class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 transition active:scale-95"
+          class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-emerald-600/20 transition active:scale-95"
         >
           <Download class="w-4 h-4" />
           <span>Export CSV Report</span>
@@ -58,66 +59,66 @@ if (!session || session.role !== 'admin') {
 
     <!-- Overview Metrics Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="p-5 rounded-3xl bg-slate-950/80 border border-white/10 shadow-glass-dark space-y-3">
+      <div class="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Enrolled</span>
-          <div class="p-2 rounded-2xl bg-brand-500/20 text-brand-400">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Enrolled</span>
+          <div class="p-2.5 rounded-2xl bg-brand-50 text-brand-600">
             <GraduationCap class="w-4 h-4" />
           </div>
         </div>
         <div>
-          <span id="metric-students" class="block text-3xl font-black text-white">--</span>
-          <div class="flex items-center gap-1 text-[11px] text-emerald-400 font-bold mt-1">
+          <span id="metric-students" class="block text-3xl font-black text-slate-900">--</span>
+          <div class="flex items-center gap-1 text-[11px] text-emerald-600 font-bold mt-1">
             <TrendingUp class="w-3 h-3" />
             <span>Active Enrolled Students</span>
           </div>
         </div>
       </div>
 
-      <div class="p-5 rounded-3xl bg-slate-950/80 border border-white/10 shadow-glass-dark space-y-3">
+      <div class="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Present Today</span>
-          <div class="p-2 rounded-2xl bg-emerald-500/20 text-emerald-400">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Present Today</span>
+          <div class="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600">
             <UserCheck class="w-4 h-4" />
           </div>
         </div>
         <div>
-          <span id="metric-present" class="block text-3xl font-black text-emerald-400">--</span>
-          <span class="text-[11px] text-slate-400 font-medium">Recorded QR & Manual marks</span>
+          <span id="metric-present" class="block text-3xl font-black text-emerald-600">--</span>
+          <span class="text-[11px] text-slate-500 font-medium">Recorded QR & Manual marks</span>
         </div>
       </div>
 
-      <div class="p-5 rounded-3xl bg-slate-950/80 border border-white/10 shadow-glass-dark space-y-3">
+      <div class="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Absences Today</span>
-          <div class="p-2 rounded-2xl bg-rose-500/20 text-rose-400">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Absences Today</span>
+          <div class="p-2.5 rounded-2xl bg-rose-50 text-rose-600">
             <UserX class="w-4 h-4" />
           </div>
         </div>
         <div>
-          <span id="metric-absent" class="block text-3xl font-black text-rose-400">--</span>
-          <span class="text-[11px] text-slate-400 font-medium">Unexcused / Pending review</span>
+          <span id="metric-absent" class="block text-3xl font-black text-rose-600">--</span>
+          <span class="text-[11px] text-slate-500 font-medium">Unexcused / Pending review</span>
         </div>
       </div>
 
-      <div class="p-5 rounded-3xl bg-slate-950/80 border border-white/10 shadow-glass-dark space-y-3">
+      <div class="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Institution Avg</span>
-          <div class="p-2 rounded-2xl bg-indigo-500/20 text-indigo-400">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Institution Avg</span>
+          <div class="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600">
             <Sparkles class="w-4 h-4" />
           </div>
         </div>
         <div>
-          <span id="metric-avg" class="block text-3xl font-black text-brand-400">89.4%</span>
-          <span class="text-[11px] text-emerald-400 font-bold">Above 75% target</span>
+          <span id="metric-avg" class="block text-3xl font-black text-brand-600">89.4%</span>
+          <span class="text-[11px] text-emerald-600 font-bold">Above 75% target</span>
         </div>
       </div>
     </div>
 
     <!-- Quick Portal Navigation Shortcuts -->
     <div class="space-y-4">
-      <h2 class="text-lg font-black text-white flex items-center gap-2">
-        <Sparkles class="w-5 h-5 text-brand-400" />
+      <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+        <Sparkles class="w-5 h-5 text-brand-600" />
         <span>Quick Access Hub</span>
       </h2>
 
@@ -125,68 +126,68 @@ if (!session || session.role !== 'admin') {
         <!-- Attendance QR Link -->
         <a
           href="/admin/qr"
-          class="group p-6 rounded-3xl bg-slate-950/80 border border-brand-500/30 hover:border-brand-500/80 transition-all duration-300 shadow-glass-dark space-y-4 hover:-translate-y-1 relative overflow-hidden"
+          class="group p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-brand-500/50 transition-all duration-300 shadow-sm hover:shadow-md space-y-4 hover:-translate-y-1 relative overflow-hidden"
         >
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-400 flex items-center justify-center group-hover:scale-110 transition">
+            <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center group-hover:scale-110 transition">
               <QrCode class="w-6 h-6" />
             </div>
-            <ArrowRight class="w-5 h-5 text-slate-500 group-hover:text-brand-400 group-hover:translate-x-1 transition" />
+            <ArrowRight class="w-5 h-5 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition" />
           </div>
           <div>
-            <h3 class="font-bold text-base text-white group-hover:text-brand-300 transition">Attendance QR</h3>
-            <p class="text-xs text-slate-400 mt-1">Generate dynamic QR codes & terminate previous tokens.</p>
+            <h3 class="font-bold text-base text-slate-900 group-hover:text-brand-600 transition">Attendance QR</h3>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Generate dynamic QR codes & terminate previous tokens.</p>
           </div>
         </a>
 
         <!-- Student Directory Link -->
         <a
           href="/admin/students"
-          class="group p-6 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-brand-500/50 transition-all duration-300 shadow-glass-dark space-y-4 hover:-translate-y-1"
+          class="group p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-brand-500/50 transition-all duration-300 shadow-sm hover:shadow-md space-y-4 hover:-translate-y-1"
         >
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-400 flex items-center justify-center group-hover:scale-110 transition">
+            <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center group-hover:scale-110 transition">
               <GraduationCap class="w-6 h-6" />
             </div>
-            <ArrowRight class="w-5 h-5 text-slate-500 group-hover:text-brand-400 group-hover:translate-x-1 transition" />
+            <ArrowRight class="w-5 h-5 text-slate-400 group-hover:text-brand-600 group-hover:translate-x-1 transition" />
           </div>
           <div>
-            <h3 class="font-bold text-base text-white group-hover:text-brand-300 transition">Student Directory</h3>
-            <p class="text-xs text-slate-400 mt-1">Enroll new students, search records, and manage batch allocations.</p>
+            <h3 class="font-bold text-base text-slate-900 group-hover:text-brand-600 transition">Student Directory</h3>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Enroll new students, search records, and manage batch allocations.</p>
           </div>
         </a>
 
         <!-- Faculty Directory Link -->
         <a
           href="/admin/teachers"
-          class="group p-6 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-emerald-500/50 transition-all duration-300 shadow-glass-dark space-y-4 hover:-translate-y-1"
+          class="group p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-emerald-500/50 transition-all duration-300 shadow-sm hover:shadow-md space-y-4 hover:-translate-y-1"
         >
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
               <Users class="w-6 h-6" />
             </div>
-            <ArrowRight class="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition" />
+            <ArrowRight class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition" />
           </div>
           <div>
-            <h3 class="font-bold text-base text-white group-hover:text-emerald-300 transition">Faculty & Teachers</h3>
-            <p class="text-xs text-slate-400 mt-1">Manage teaching staff credentials and assigned curriculum modules.</p>
+            <h3 class="font-bold text-base text-slate-900 group-hover:text-emerald-600 transition">Faculty & Teachers</h3>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Manage teaching staff credentials and assigned curriculum modules.</p>
           </div>
         </a>
 
         <!-- Attendance Reports Link -->
         <a
           href="/admin/reports"
-          class="group p-6 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-indigo-500/50 transition-all duration-300 shadow-glass-dark space-y-4 hover:-translate-y-1"
+          class="group p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-indigo-500/50 transition-all duration-300 shadow-sm hover:shadow-md space-y-4 hover:-translate-y-1"
         >
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
               <BarChart3 class="w-6 h-6" />
             </div>
-            <ArrowRight class="w-5 h-5 text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition" />
+            <ArrowRight class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition" />
           </div>
           <div>
-            <h3 class="font-bold text-base text-white group-hover:text-indigo-300 transition">Attendance Reports</h3>
-            <p class="text-xs text-slate-400 mt-1">Analyze batch trends, view detailed attendance records, and export CSVs.</p>
+            <h3 class="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition">Attendance Reports</h3>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Analyze batch trends, view detailed attendance records, and export CSVs.</p>
           </div>
         </a>
       </div>
@@ -195,53 +196,53 @@ if (!session || session.role !== 'admin') {
     <!-- System Status & Quick Summary -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Active Batches Overview -->
-      <div class="p-6 rounded-3xl bg-slate-950/80 border border-white/10 shadow-glass-dark space-y-4">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <CheckCircle2 class="w-5 h-5 text-emerald-400" />
+      <div class="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <CheckCircle2 class="w-5 h-5 text-emerald-500" />
           <span>Active Batches & Programs</span>
         </h3>
         <div class="space-y-3 text-xs">
-          <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-white/5">
+          <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center">
+              <div class="w-9 h-9 rounded-xl bg-brand-100 text-brand-700 font-bold flex items-center justify-center">
                 BCA
               </div>
               <div>
-                <span class="font-bold text-white block">BCA 2A - Web & Python</span>
-                <span class="text-slate-400 text-[11px]">Morning Batch (9:00 AM - 12:00 PM)</span>
+                <span class="font-bold text-slate-900 block">BCA 2A - Web & Python</span>
+                <span class="text-slate-500 text-[11px] font-medium">Morning Batch (9:00 AM - 12:00 PM)</span>
               </div>
             </div>
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Active</span>
           </div>
 
-          <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-900 border border-white/5">
+          <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center">
+              <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">
                 PGD
               </div>
               <div>
-                <span class="font-bold text-white block">PGDCA - Database Management</span>
-                <span class="text-slate-400 text-[11px]">Afternoon Batch (1:00 PM - 4:00 PM)</span>
+                <span class="font-bold text-slate-900 block">PGDCA - Database Management</span>
+                <span class="text-slate-500 text-[11px] font-medium">Afternoon Batch (1:00 PM - 4:00 PM)</span>
               </div>
             </div>
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Active</span>
           </div>
         </div>
       </div>
 
       <!-- Live Attendance Summary -->
-      <div class="p-6 rounded-3xl bg-slate-950/80 border border-white/10 shadow-glass-dark space-y-4">
-        <h3 class="text-base font-bold text-white flex items-center justify-between">
+      <div class="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+        <h3 class="text-base font-bold text-slate-900 flex items-center justify-between">
           <span class="flex items-center gap-2">
-            <Clock class="w-5 h-5 text-brand-400" />
+            <Clock class="w-5 h-5 text-brand-600" />
             <span>Latest Attendance Record</span>
           </span>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200/80">
             Realtime Neon DB
           </span>
         </h3>
         <div id="overview-recent-records" class="space-y-3">
-          <p class="text-slate-400 text-center py-6 text-xs">Loading latest attendance record...</p>
+          <p class="text-slate-400 text-center py-6 text-xs font-medium">Loading latest attendance record...</p>
         </div>
       </div>
     </div>
@@ -265,14 +266,6 @@ if (!session || session.role !== 'admin') {
         if (repRes.ok) {
           const { reports } = await repRes.json();
           const recentContainer = document.getElementById('overview-recent-records')!;
-          
-          const sampleRecord = {
-            studentName: 'Rahul Kumar',
-            course: 'BCA',
-            date: '08 Sep 2026',
-            time: '08:17:32 AM',
-            status: 'PRESENT ✓'
-          };
 
           if (reports && reports.length > 0) {
             const r = reports[0];
@@ -286,19 +279,19 @@ if (!session || session.role !== 'admin') {
             const dateStr = r.date || '08 Sep 2026';
 
             recentContainer.innerHTML = `
-              <div class="bg-slate-900 border-2 border-emerald-500/40 rounded-2xl p-5 font-mono text-xs space-y-2.5 shadow-lg relative overflow-hidden">
-                <div class="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span class="font-sans font-bold text-slate-400 uppercase text-[11px]">Attendance Records</span>
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <div class="bg-slate-50 border-2 border-emerald-500/40 rounded-2xl p-5 font-mono text-xs space-y-2.5 shadow-sm relative overflow-hidden text-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span class="font-sans font-bold text-slate-500 uppercase text-[11px]">Attendance Records</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
                 </div>
                 <div class="space-y-1.5">
-                  <div class="flex justify-between"><span class="text-slate-400">Student:</span><span class="font-bold text-white">${r.studentName || 'Rahul Kumar'}</span></div>
-                  <div class="flex justify-between"><span class="text-slate-400">Course:</span><span class="font-bold text-brand-400">${r.className || 'BCA'}</span></div>
-                  <div class="flex justify-between"><span class="text-slate-400">Date:</span><span class="text-slate-300">${dateStr}</span></div>
-                  <div class="flex justify-between"><span class="text-slate-400">Time:</span><span class="text-slate-300">${timeStr}</span></div>
-                  <div class="flex justify-between pt-2 border-t border-white/10 font-sans">
-                    <span class="text-slate-400 font-bold">Status:</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                  <div class="flex justify-between"><span class="text-slate-500">Student:</span><span class="font-bold text-slate-900">${r.studentName || 'Rahul Kumar'}</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Course:</span><span class="font-bold text-brand-600">${r.className || 'BCA'}</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Date:</span><span class="text-slate-700">${dateStr}</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Time:</span><span class="text-slate-700">${timeStr}</span></div>
+                  <div class="flex justify-between pt-2 border-t border-slate-200 font-sans">
+                    <span class="text-slate-500 font-bold">Status:</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
                       PRESENT ✓
                     </span>
                   </div>
@@ -310,19 +303,19 @@ if (!session || session.role !== 'admin') {
             document.getElementById('metric-absent')!.textContent = '108';
 
             recentContainer.innerHTML = `
-              <div class="bg-slate-900 border-2 border-emerald-500/40 rounded-2xl p-5 font-mono text-xs space-y-2.5 shadow-lg relative overflow-hidden">
-                <div class="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span class="font-sans font-bold text-slate-400 uppercase text-[11px]">Attendance Records</span>
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <div class="bg-slate-50 border-2 border-emerald-500/40 rounded-2xl p-5 font-mono text-xs space-y-2.5 shadow-sm relative overflow-hidden text-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span class="font-sans font-bold text-slate-500 uppercase text-[11px]">Attendance Records</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
                 </div>
                 <div class="space-y-1.5">
-                  <div class="flex justify-between"><span class="text-slate-400">Student:</span><span class="font-bold text-white">Rahul Kumar</span></div>
-                  <div class="flex justify-between"><span class="text-slate-400">Course:</span><span class="font-bold text-brand-400">BCA</span></div>
-                  <div class="flex justify-between"><span class="text-slate-400">Date:</span><span class="text-slate-300">08 Sep 2026</span></div>
-                  <div class="flex justify-between"><span class="text-slate-400">Time:</span><span class="text-slate-300">08:17:32 AM</span></div>
-                  <div class="flex justify-between pt-2 border-t border-white/10 font-sans">
-                    <span class="text-slate-400 font-bold">Status:</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                  <div class="flex justify-between"><span class="text-slate-500">Student:</span><span class="font-bold text-slate-900">Rahul Kumar</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Course:</span><span class="font-bold text-brand-600">BCA</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Date:</span><span class="text-slate-700">08 Sep 2026</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Time:</span><span class="text-slate-700">08:17:32 AM</span></div>
+                  <div class="flex justify-between pt-2 border-t border-slate-200 font-sans">
+                    <span class="text-slate-500 font-bold">Status:</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
                       PRESENT ✓
                     </span>
                   </div>
