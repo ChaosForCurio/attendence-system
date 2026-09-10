@@ -1,8 +1,5 @@
-const CACHE_NAME = 'attendance-pwa-v1';
+const CACHE_NAME = 'attendance-pwa-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/login',
-  '/student',
   '/manifest.json',
   '/favicon.svg'
 ];
@@ -28,22 +25,45 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Always fetch API endpoints live from server
-  if (event.request.url.includes('/api/')) {
+  const req = event.request;
+
+  // 1. Only handle GET requests
+  if (req.method !== 'GET') {
     return;
   }
-  
+
+  const url = new URL(req.url);
+
+  // 2. Only handle http/https requests
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // 3. Always fetch API endpoints live from server
+  if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // 4. Do not intercept HTML document navigation requests (allows SSR redirects like / -> /login to work natively)
+  if (req.mode === 'navigate') {
+    return;
+  }
+
+  // 5. Stale-while-revalidate / Cache-first strategy for static assets
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+    caches.match(req).then((cachedResponse) => {
+      const fetchPromise = fetch(req)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, responseToCache));
           }
-        }).catch(() => {});
-        return cachedResponse;
-      }
-      return fetch(event.request);
+          return networkResponse;
+        })
+        .catch(() => cachedResponse);
+
+      return cachedResponse || fetchPromise;
     })
   );
 });
+

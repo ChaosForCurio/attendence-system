@@ -13,7 +13,9 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "npx tsx src/db/seed.ts",
-    "test": "npx tsx src/tests/run-tests.ts"
+    "test": "npx tsx src/tests/run-tests.ts",
+    "deploy": "vercel",
+    "deploy:prod": "vercel --prod"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -39,6 +41,7 @@
     "@types/qrcode": "^1.5.6",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.5",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "vercel": "^59.15.1"
   }
 }
