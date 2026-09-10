@@ -15,7 +15,7 @@ import {
 
 const { title = 'Admin Portal - Bhavya Computer Classes' } = Astro.props;
 const session = getSessionFromRequest(Astro.request);
-if (!session || session.role !== 'admin') {
+if (!session || (session.role !== 'admin' && session.role !== 'teacher')) {
   return Astro.redirect('/login');
 }
 

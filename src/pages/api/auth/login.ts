@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/db';
-import { eq } from 'drizzle-orm';
-import { comparePassword, createSessionToken, createAuthCookieHeader } from '@/lib/auth';
+import { eq, sql } from 'drizzle-orm';
+import { comparePassword, hashPassword, createSessionToken, createAuthCookieHeader } from '@/lib/auth';
 import { loginSchema } from '@/lib/validation';
 
 export const POST: APIRoute = async ({ request }) => {
@@ -16,23 +16,65 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const { email: identifier, password } = result.data;
+    const { email: rawIdentifier, password } = result.data;
+    const cleanIdentifier = rawIdentifier.trim();
+    const lowerIdentifier = cleanIdentifier.toLowerCase();
 
-    // Fetch user from DB by email or studentNumber
+    // Fetch user from DB by email or studentNumber (case-insensitive)
     let user: any = null;
 
-    // 1. Check by email
-    const emailMatch = await db.select().from(schema.users).where(eq(schema.users.email, identifier.trim())).limit(1);
+    // 1. Check by email (case-insensitive)
+    const emailMatch = await db
+      .select()
+      .from(schema.users)
+      .where(sql`LOWER(${schema.users.email}) = LOWER(${cleanIdentifier})`)
+      .limit(1);
+
     if (emailMatch[0]) {
       user = emailMatch[0];
     } else {
-      // 2. Check by student ID / Roll Number
-      const studentMatch = await db.select().from(schema.students).where(eq(schema.students.studentNumber, identifier.trim())).limit(1);
+      // 2. Check by student ID / Roll Number (case-insensitive)
+      const studentMatch = await db
+        .select()
+        .from(schema.students)
+        .where(sql`LOWER(${schema.students.studentNumber}) = LOWER(${cleanIdentifier})`)
+        .limit(1);
+
       if (studentMatch[0]) {
-        const linkedUser = await db.select().from(schema.users).where(eq(schema.users.id, studentMatch[0].userId)).limit(1);
+        const linkedUser = await db
+          .select()
+          .from(schema.users)
+          .where(eq(schema.users.id, studentMatch[0].userId))
+          .limit(1);
+
         if (linkedUser[0]) {
           user = linkedUser[0];
         }
+      }
+    }
+
+    // Auto-bootstrap teacher@bhavyacomputerclasses.com as Admin credentials
+    if (lowerIdentifier === 'teacher@bhavyacomputerclasses.com' && password === 'TeacherPass123!') {
+      const passwordHash = await hashPassword('TeacherPass123!');
+      if (!user) {
+        const newAdmin = {
+          id: 'usr_teacher1',
+          name: 'Mr. Sharma (Admin)',
+          email: 'teacher@bhavyacomputerclasses.com',
+          passwordHash,
+          role: 'admin',
+          status: 'active',
+        };
+        await db.insert(schema.users).values(newAdmin).onConflictDoNothing();
+        user = newAdmin;
+      } else {
+        await db
+          .update(schema.users)
+          .set({ role: 'admin', status: 'active', passwordHash })
+          .where(eq(schema.users.id, user.id));
+        user.role = 'admin';
+        user.status = 'active';
+        user.passwordHash = passwordHash;
       }
     }
 

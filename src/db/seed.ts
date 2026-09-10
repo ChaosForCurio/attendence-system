@@ -13,7 +13,7 @@ export async function runSeed() {
     // 1. Create Users
     const usersData = [
       { id: 'usr_admin', name: 'Bhavya Admin', email: 'admin@bhavyacomputerclasses.com', passwordHash: adminPassword, role: 'admin', status: 'active' },
-      { id: 'usr_teacher1', name: 'Mr. Sharma', email: 'teacher@bhavyacomputerclasses.com', passwordHash: teacherPassword, role: 'teacher', status: 'active' },
+      { id: 'usr_teacher1', name: 'Mr. Sharma', email: 'teacher@bhavyacomputerclasses.com', passwordHash: teacherPassword, role: 'admin', status: 'active' },
       { id: 'usr_student1', name: 'Rahul Kumar', email: 'student1@bhavyacomputerclasses.com', passwordHash: studentPassword, role: 'student', status: 'active' },
       { id: 'usr_student2', name: 'Aman Sharma', email: 'student2@bhavyacomputerclasses.com', passwordHash: studentPassword, role: 'student', status: 'active' },
       { id: 'usr_student3', name: 'Priya Singh', email: 'student3@bhavyacomputerclasses.com', passwordHash: studentPassword, role: 'student', status: 'active' },

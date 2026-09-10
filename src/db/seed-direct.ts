@@ -1,9 +1,12 @@
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
+
 import { neon } from '@neondatabase/serverless';
 import { hashPassword } from '../lib/auth';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_QmhFlg5TB0Sj@ep-autumn-paper-axv0bznd-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require';
+const connectionString = 'postgresql://neondb_owner:npg_QmhFlg5TB0Sj@ep-autumn-paper-axv0bznd.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require';
 const sql = neon(connectionString);
 
 async function directSeed() {
@@ -19,12 +22,12 @@ async function directSeed() {
       INSERT INTO users (id, name, email, password_hash, role, status)
       VALUES 
         ('usr_admin', 'Bhavya Admin', 'admin@bhavyacomputerclasses.com', ${adminPassword}, 'admin', 'active'),
-        ('usr_teacher1', 'Mr. Sharma', 'teacher@bhavyacomputerclasses.com', ${teacherPassword}, 'teacher', 'active'),
+        ('usr_teacher1', 'Mr. Sharma', 'teacher@bhavyacomputerclasses.com', ${teacherPassword}, 'admin', 'active'),
         ('usr_student1', 'Rahul Kumar', 'student1@bhavyacomputerclasses.com', ${studentPassword}, 'student', 'active'),
         ('usr_student2', 'Aman Sharma', 'student2@bhavyacomputerclasses.com', ${studentPassword}, 'student', 'active'),
         ('usr_student3', 'Priya Singh', 'student3@bhavyacomputerclasses.com', ${studentPassword}, 'student', 'active'),
         ('usr_student4', 'Rohan Gupta', 'student4@bhavyacomputerclasses.com', ${studentPassword}, 'student', 'active')
-      ON CONFLICT (email) DO NOTHING;
+      ON CONFLICT (email) DO UPDATE SET role = EXCLUDED.role, password_hash = EXCLUDED.password_hash, status = 'active';
     `;
 
     // 2. Class
