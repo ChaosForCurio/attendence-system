@@ -96,6 +96,9 @@ export function createAuthCookieHeader(token: string, isProduction = process.env
 }
 
 // Clear cookie header builder
-export function createClearAuthCookieHeader(): string {
-  return `${COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`;
+export function createClearAuthCookieHeader(isProduction = process.env.NODE_ENV === 'production'): string[] {
+  return [
+    `${COOKIE_NAME}=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Lax`,
+    `${COOKIE_NAME}=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax`
+  ];
 }

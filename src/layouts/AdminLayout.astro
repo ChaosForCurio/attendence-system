@@ -247,8 +247,12 @@ const currentPath = Astro.url.pathname;
     backdrop?.addEventListener('click', closeSidebar);
 
     document.getElementById('admin-logout-btn')?.addEventListener('click', async () => {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/login';
+      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure;';
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } catch (err) {}
+      window.location.replace('/login');
     });
   </script>
 </BaseLayout>
