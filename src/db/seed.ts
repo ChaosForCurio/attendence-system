@@ -24,30 +24,33 @@ export async function runSeed() {
       await db.insert(schema.users).values(u).onConflictDoNothing();
     }
 
-    // 2. Create Class / Batch
-    const classData = { id: 'cls_bca2a', name: 'Batch 2026-A (Web & Python)', year: 1, section: 'A', academicYear: '2026', status: 'active' };
-    await db.insert(schema.classes).values(classData).onConflictDoNothing();
+    // 2. Create Classes / RSCIT Batches
+    const classesData = [
+      { id: 'cls_rscit_jan_a', name: 'RSCIT Jan 2026 (Batch A - Morning)', year: 1, section: 'A', academicYear: '2026', status: 'active' },
+      { id: 'cls_rscit_jan_b', name: 'RSCIT Jan 2026 (Batch B - Evening)', year: 1, section: 'B', academicYear: '2026', status: 'active' },
+      { id: 'cls_rscit_feb_a', name: 'RSCIT Feb 2026 (Batch A - Regular)', year: 1, section: 'A', academicYear: '2026', status: 'active' },
+    ];
+    for (const c of classesData) {
+      await db.insert(schema.classes).values(c).onConflictDoNothing();
+    }
 
     // 3. Create Teacher & Student profiles
     await db.insert(schema.teachers).values({ id: 'tch_sharma', userId: 'usr_teacher1' }).onConflictDoNothing();
 
     const studentsData = [
-      { id: 'std_rahul', userId: 'usr_student1', studentNumber: 'BCC202601', classId: 'cls_bca2a' },
-      { id: 'std_aman', userId: 'usr_student2', studentNumber: 'BCC202602', classId: 'cls_bca2a' },
-      { id: 'std_priya', userId: 'usr_student3', studentNumber: 'BCC202603', classId: 'cls_bca2a' },
-      { id: 'std_rohan', userId: 'usr_student4', studentNumber: 'BCC202604', classId: 'cls_bca2a' },
+      { id: 'std_rahul', userId: 'usr_student1', studentNumber: 'RSCIT202601', classId: 'cls_rscit_jan_a' },
+      { id: 'std_aman', userId: 'usr_student2', studentNumber: 'RSCIT202602', classId: 'cls_rscit_jan_a' },
+      { id: 'std_priya', userId: 'usr_student3', studentNumber: 'RSCIT202603', classId: 'cls_rscit_jan_b' },
+      { id: 'std_rohan', userId: 'usr_student4', studentNumber: 'RSCIT202604', classId: 'cls_rscit_feb_a' },
     ];
 
     for (const s of studentsData) {
       await db.insert(schema.students).values(s).onConflictDoNothing();
     }
 
-    // 4. Create Courses / Subjects at Bhavya Computer Classes
+    // 4. Create RSCIT Course / Subject
     const subjectsData = [
-      { id: 'sub_webdev', name: 'Web Development', code: 'BCC-WEB101', description: 'Full Stack Web Development (HTML/CSS/JS/Astro)', status: 'active' },
-      { id: 'sub_python', name: 'Python & Data Science', code: 'BCC-PY201', description: 'Python Programming, Pandas, Data Analysis', status: 'active' },
-      { id: 'sub_tally', name: 'Tally Prime & Accounting', code: 'BCC-TAL301', description: 'Tally Prime, GST Accounting & Payroll', status: 'active' },
-      { id: 'sub_adca', name: 'ADCA Fundamentals', code: 'BCC-ADC100', description: 'Advanced Diploma in Computer Applications', status: 'active' },
+      { id: 'sub_rscit', name: 'RSCIT Computer Course', code: 'RSCIT-101', description: 'Rajasthan State Certificate in Information Technology', status: 'active' },
     ];
 
     for (const sub of subjectsData) {
@@ -56,10 +59,9 @@ export async function runSeed() {
 
     // 5. Class Subjects Mapping
     const classSubjectsData = [
-      { id: 'cs_webdev', classId: 'cls_bca2a', subjectId: 'sub_webdev', teacherId: 'tch_sharma' },
-      { id: 'cs_python', classId: 'cls_bca2a', subjectId: 'sub_python', teacherId: 'tch_sharma' },
-      { id: 'cs_tally', classId: 'cls_bca2a', subjectId: 'sub_tally', teacherId: 'tch_sharma' },
-      { id: 'cs_adca', classId: 'cls_bca2a', subjectId: 'sub_adca', teacherId: 'tch_sharma' },
+      { id: 'cs_rscit_jan_a', classId: 'cls_rscit_jan_a', subjectId: 'sub_rscit', teacherId: 'tch_sharma' },
+      { id: 'cs_rscit_jan_b', classId: 'cls_rscit_jan_b', subjectId: 'sub_rscit', teacherId: 'tch_sharma' },
+      { id: 'cs_rscit_feb_a', classId: 'cls_rscit_feb_a', subjectId: 'sub_rscit', teacherId: 'tch_sharma' },
     ];
 
     for (const cs of classSubjectsData) {
@@ -68,25 +70,24 @@ export async function runSeed() {
 
     // 6. Schedules for Monday (dayOfWeek = 1)
     const schedulesData = [
-      { id: 'sch_webdev_mon', classSubjectId: 'cs_webdev', dayOfWeek: 1, startTime: '09:00', endTime: '10:00', room: 'Lab 1', status: 'active' },
-      { id: 'sch_python_mon', classSubjectId: 'cs_python', dayOfWeek: 1, startTime: '10:00', endTime: '11:00', room: 'Lab 1', status: 'active' },
-      { id: 'sch_tally_mon', classSubjectId: 'cs_tally', dayOfWeek: 1, startTime: '11:00', endTime: '12:00', room: 'Lab 2', status: 'active' },
-      { id: 'sch_adca_mon', classSubjectId: 'cs_adca', dayOfWeek: 1, startTime: '12:00', endTime: '13:00', room: 'Lab 2', status: 'active' },
+      { id: 'sch_rscit_jan_a_mon', classSubjectId: 'cs_rscit_jan_a', dayOfWeek: 1, startTime: '09:00', endTime: '10:00', room: 'Lab 1', status: 'active' },
+      { id: 'sch_rscit_jan_b_mon', classSubjectId: 'cs_rscit_jan_b', dayOfWeek: 1, startTime: '16:00', endTime: '17:00', room: 'Lab 1', status: 'active' },
+      { id: 'sch_rscit_feb_a_mon', classSubjectId: 'cs_rscit_feb_a', dayOfWeek: 1, startTime: '11:00', endTime: '12:00', room: 'Lab 2', status: 'active' },
     ];
 
     for (const sch of schedulesData) {
       await db.insert(schema.schedules).values(sch).onConflictDoNothing();
     }
 
-    // 7. Active Attendance Session for Web Development today
+    // 7. Active Attendance Session for RSCIT Batch A today
     const todayStr = new Date().toISOString().split('T')[0];
     const sessionData = {
-      id: 'sess_webdev_today',
-      classSubjectId: 'cs_webdev',
-      scheduleId: 'sch_webdev_mon',
+      id: 'sess_rscit_today',
+      classSubjectId: 'cs_rscit_jan_a',
+      scheduleId: 'sch_rscit_jan_a_mon',
       date: todayStr,
       startTime: '09:00',
-      endTime: '11:59',
+      endTime: '23:59',
       lateAfter: '09:10',
       status: 'active',
       verificationMethod: 'button',
@@ -94,7 +95,7 @@ export async function runSeed() {
     };
     await db.insert(schema.attendanceSessions).values(sessionData).onConflictDoNothing();
 
-    console.log('✅ Bhavya Computer Classes Database seeded successfully!');
+    console.log('✅ Bhavya Computer Classes Database seeded successfully with RSCIT Course!');
   } catch (error) {
     console.error('Error seeding database:', error);
   }

@@ -17,6 +17,15 @@ async function directSeed() {
   const studentPassword = await hashPassword('StudentPass123!');
 
   try {
+    // Clean up legacy classes and subjects if present
+    await sql`DELETE FROM attendance_records;`;
+    await sql`DELETE FROM attendance_sessions;`;
+    await sql`DELETE FROM schedules;`;
+    await sql`DELETE FROM class_subjects;`;
+    await sql`DELETE FROM students;`;
+    await sql`DELETE FROM classes;`;
+    await sql`DELETE FROM subjects;`;
+
     // 1. Users
     await sql`
       INSERT INTO users (id, name, email, password_hash, role, status)
@@ -30,10 +39,13 @@ async function directSeed() {
       ON CONFLICT (email) DO UPDATE SET role = EXCLUDED.role, password_hash = EXCLUDED.password_hash, status = 'active';
     `;
 
-    // 2. Class
+    // 2. RSCIT Batches (Classes)
     await sql`
       INSERT INTO classes (id, name, year, section, academic_year, status)
-      VALUES ('cls_bca2a', 'Batch 2026-A (Web & Python)', 1, 'A', '2026', 'active')
+      VALUES 
+        ('cls_rscit_jan_a', 'RSCIT Jan 2026 (Batch A - Morning)', 1, 'A', '2026', 'active'),
+        ('cls_rscit_jan_b', 'RSCIT Jan 2026 (Batch B - Evening)', 1, 'B', '2026', 'active'),
+        ('cls_rscit_feb_a', 'RSCIT Feb 2026 (Batch A - Regular)', 1, 'A', '2026', 'active')
       ON CONFLICT (id) DO NOTHING;
     `;
 
@@ -47,55 +59,50 @@ async function directSeed() {
     await sql`
       INSERT INTO students (id, user_id, student_number, class_id)
       VALUES 
-        ('std_rahul', 'usr_student1', 'BCC202601', 'cls_bca2a'),
-        ('std_aman', 'usr_student2', 'BCC202602', 'cls_bca2a'),
-        ('std_priya', 'usr_student3', 'BCC202603', 'cls_bca2a'),
-        ('std_rohan', 'usr_student4', 'BCC202604', 'cls_bca2a')
+        ('std_rahul', 'usr_student1', 'RSCIT202601', 'cls_rscit_jan_a'),
+        ('std_aman', 'usr_student2', 'RSCIT202602', 'cls_rscit_jan_a'),
+        ('std_priya', 'usr_student3', 'RSCIT202603', 'cls_rscit_jan_b'),
+        ('std_rohan', 'usr_student4', 'RSCIT202604', 'cls_rscit_feb_a')
       ON CONFLICT (student_number) DO NOTHING;
     `;
 
-    // 4. Subjects
+    // 4. RSCIT Course (Subject)
     await sql`
       INSERT INTO subjects (id, name, code, description, status)
       VALUES 
-        ('sub_webdev', 'Web Development', 'BCC-WEB101', 'Full Stack Web Engineering (HTML/CSS/JS/Astro)', 'active'),
-        ('sub_python', 'Python & Data Science', 'BCC-PY201', 'Python Programming, Pandas, Data Analysis', 'active'),
-        ('sub_tally', 'Tally Prime & Accounting', 'BCC-TAL301', 'Tally Prime, GST Accounting & Payroll', 'active'),
-        ('sub_adca', 'ADCA Fundamentals', 'BCC-ADC100', 'Advanced Diploma in Computer Applications', 'active')
+        ('sub_rscit', 'RSCIT Computer Course', 'RSCIT-101', 'Rajasthan State Certificate in Information Technology', 'active')
       ON CONFLICT (code) DO NOTHING;
     `;
 
-    // 5. Class Subjects
+    // 5. Class Subjects Mapping
     await sql`
       INSERT INTO class_subjects (id, class_id, subject_id, teacher_id)
       VALUES 
-        ('cs_webdev', 'cls_bca2a', 'sub_webdev', 'tch_sharma'),
-        ('cs_python', 'cls_bca2a', 'sub_python', 'tch_sharma'),
-        ('cs_tally', 'cls_bca2a', 'sub_tally', 'tch_sharma'),
-        ('cs_adca', 'cls_bca2a', 'sub_adca', 'tch_sharma')
+        ('cs_rscit_jan_a', 'cls_rscit_jan_a', 'sub_rscit', 'tch_sharma'),
+        ('cs_rscit_jan_b', 'cls_rscit_jan_b', 'sub_rscit', 'tch_sharma'),
+        ('cs_rscit_feb_a', 'cls_rscit_feb_a', 'sub_rscit', 'tch_sharma')
       ON CONFLICT (id) DO NOTHING;
     `;
 
-    // 6. Schedules
+    // 6. Schedules for Monday
     await sql`
       INSERT INTO schedules (id, class_subject_id, day_of_week, start_time, end_time, room, status)
       VALUES 
-        ('sch_webdev_mon', 'cs_webdev', 1, '09:00', '10:00', 'Lab 1', 'active'),
-        ('sch_python_mon', 'cs_python', 1, '10:00', '11:00', 'Lab 1', 'active'),
-        ('sch_tally_mon', 'cs_tally', 1, '11:00', '12:00', 'Lab 2', 'active'),
-        ('sch_adca_mon', 'cs_adca', 1, '12:00', '13:00', 'Lab 2', 'active')
+        ('sch_rscit_jan_a_mon', 'cs_rscit_jan_a', 1, '09:00', '10:00', 'Lab 1', 'active'),
+        ('sch_rscit_jan_b_mon', 'cs_rscit_jan_b', 1, '16:00', '17:00', 'Lab 1', 'active'),
+        ('sch_rscit_feb_a_mon', 'cs_rscit_feb_a', 1, '11:00', '12:00', 'Lab 2', 'active')
       ON CONFLICT (id) DO NOTHING;
     `;
 
-    // 7. Active Session for today
+    // 7. Active Session for RSCIT Batch A today
     const todayStr = new Date().toISOString().split('T')[0];
     await sql`
       INSERT INTO attendance_sessions (id, class_subject_id, schedule_id, date, start_time, end_time, late_after, status, verification_method, created_by)
-      VALUES ('sess_webdev_today', 'cs_webdev', 'sch_webdev_mon', ${todayStr}, '09:00', '23:59', '09:10', 'active', 'button', 'usr_teacher1')
+      VALUES ('sess_rscit_today', 'cs_rscit_jan_a', 'sch_rscit_jan_a_mon', ${todayStr}, '09:00', '23:59', '09:10', 'active', 'button', 'usr_teacher1')
       ON CONFLICT (id) DO NOTHING;
     `;
 
-    console.log('✅ Bhavya Computer Classes Database seeded successfully on Neon!');
+    console.log('✅ Bhavya Computer Classes Database seeded successfully with RSCIT Course and Batches on Neon!');
   } catch (err) {
     console.error('Seed error:', err);
   }

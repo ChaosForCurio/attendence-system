@@ -11,6 +11,7 @@ import {
   Copy,
   Printer,
   KeyRound,
+  Layers,
 } from 'lucide-astro';
 
 const session = getSessionFromRequest(Astro.request);
@@ -35,6 +36,14 @@ if (!session || session.role !== 'admin') {
       </div>
 
       <div class="flex items-center gap-2">
+        <button
+          id="open-create-batch-modal"
+          class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-emerald-600/20 transition active:scale-95 whitespace-nowrap cursor-pointer"
+        >
+          <Layers class="w-4 h-4" />
+          <span>Create New Batch</span>
+        </button>
+
         <button
           id="open-qr-poster-modal"
           class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-sm transition active:scale-95 whitespace-nowrap cursor-pointer"
@@ -68,7 +77,7 @@ if (!session || session.role !== 'admin') {
       <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
         <div>
           <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Active Batches</span>
-          <span class="text-2xl font-black text-emerald-600">BCA 2A</span>
+          <span class="text-2xl font-black text-emerald-600">RSCIT Batches</span>
         </div>
         <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
           <Users class="w-5 h-5" />
@@ -163,8 +172,9 @@ if (!session || session.role !== 'admin') {
           <div>
             <label class="block text-slate-700 font-semibold mb-1">Class / Program</label>
             <select id="new-std-class" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-              <option value="cls_bca_2a">BCA 2nd Year</option>
-              <option value="cls_pgdca">PGDCA</option>
+              <option value="cls_rscit_jan_a">RSCIT Jan 2026 (Batch A)</option>
+              <option value="cls_rscit_jan_b">RSCIT Jan 2026 (Batch B)</option>
+              <option value="cls_rscit_feb_a">RSCIT Feb 2026 (Batch A)</option>
             </select>
           </div>
           <div>
@@ -188,6 +198,40 @@ if (!session || session.role !== 'admin') {
 
         <button type="submit" id="submit-student-btn" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold transition mt-3 shadow-md shadow-brand-600/20 cursor-pointer">
           Enroll Student &amp; Generate Credentials
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Batch Modal -->
+  <div id="batch-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200/80 rounded-3xl p-6 max-w-md w-full text-slate-900 space-y-4 shadow-2xl relative">
+      <button id="close-batch-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold p-1">✕</button>
+      
+      <div>
+        <h3 class="text-lg font-bold">Create New Batch</h3>
+        <p class="text-xs text-slate-500 font-medium">Add a new RSCIT batch for student enrollments</p>
+      </div>
+
+      <form id="create-batch-form" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Batch Name</label>
+          <input type="text" id="new-batch-name" required placeholder="e.g. RSCIT March 2026 (Batch A)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Section</label>
+            <input type="text" id="new-batch-section" required value="A" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Academic Year</label>
+            <input type="text" id="new-batch-academic-year" required value="2026" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <button type="submit" id="submit-batch-btn" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold transition mt-3 shadow-md shadow-emerald-600/20 cursor-pointer">
+          Create Batch
         </button>
       </form>
     </div>
@@ -412,6 +456,54 @@ if (!session || session.role !== 'admin') {
     });
     document.getElementById('print-qr-btn')?.addEventListener('click', () => {
       window.print();
+    });
+
+    const batchModal = document.getElementById('batch-modal')!;
+    document.getElementById('open-create-batch-modal')?.addEventListener('click', () => {
+      batchModal.classList.remove('hidden');
+    });
+    document.getElementById('close-batch-modal')?.addEventListener('click', () => {
+      batchModal.classList.add('hidden');
+    });
+
+    // Handle Create Batch form submit
+    document.getElementById('create-batch-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-batch-btn') as HTMLButtonElement;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+
+      const name = (document.getElementById('new-batch-name') as HTMLInputElement).value;
+      const section = (document.getElementById('new-batch-section') as HTMLInputElement).value || 'A';
+      const academicYear = (document.getElementById('new-batch-academic-year') as HTMLInputElement).value || '2026';
+
+      try {
+        const res = await fetch('/api/admin/classes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            year: 1,
+            section,
+            academicYear,
+          })
+        });
+
+        if (res.ok) {
+          (window as any).showToast?.(`Batch "${name}" created successfully!`, 'success');
+          batchModal.classList.add('hidden');
+          (document.getElementById('create-batch-form') as HTMLFormElement).reset();
+          loadClasses();
+        } else {
+          const data = await res.json();
+          (window as any).showToast?.(data.error || 'Failed to create batch.', 'error');
+        }
+      } catch (err) {
+        (window as any).showToast?.('Error creating batch.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Batch';
+      }
     });
 
     // Handle Add Student form submit

@@ -1,165 +1,190 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getSessionFromRequest } from '@/lib/auth';
-import { Monitor, CheckCircle2, AlertCircle, ArrowRight, Lock, Sparkles, UserCheck, ShieldCheck, Home } from 'lucide-astro';
+import { Monitor, CheckCircle2, AlertCircle, ArrowRight, Lock, UserCheck, ShieldCheck, Home } from 'lucide-astro';
 
 const session = getSessionFromRequest(Astro.request);
 const isStudentLoggedIn = session && session.role === 'student';
 ---
 
 <BaseLayout title="Classroom PC Attendance - Bhavya Computer Classes">
-  <div class="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden">
-    
-    <!-- Background Ambient Glow -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-500/15 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-10 right-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="min-h-screen bg-white text-white flex flex-col justify-center items-center p-4 sm:p-6">
 
-    <div class="w-full max-w-lg relative z-10 space-y-6">
+    <div class="w-full max-w-4xl">
 
-      <!-- Header Branding -->
-      <div class="text-center space-y-2">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900 border border-white/10 text-brand-400 text-xs font-bold tracking-wide">
-          <Monitor class="w-4 h-4 text-emerald-400" />
-          <span>Classroom PC / Shared Tablet Portal</span>
-        </div>
-        <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Bhavya Computer Classes</h1>
-        <p class="text-xs text-slate-400">No Phone? Mark Attendance Directly via Student Login</p>
-      </div>
+      <!-- Main Card — matches login page two-panel layout -->
+      <div class="w-full bg-black rounded-3xl shadow-2xl border border-white/10 overflow-hidden flex flex-col md:flex-row min-h-[520px]">
 
-      <!-- Flow Container -->
-      <div class="bg-slate-900/90 border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
+        <!-- LEFT PANEL: Branding -->
+        <div class="flex-1 flex flex-col justify-center items-start p-8 sm:p-12 bg-zinc-900 relative overflow-hidden">
+          <span class="absolute top-4 right-4 text-white/20 text-2xl font-light select-none">✕</span>
 
-        <!-- STATE 1: NOT LOGGED IN - LOGIN FORM -->
-        <div id="unauthenticated-step" class={isStudentLoggedIn ? 'hidden' : 'space-y-5'}>
-          <div class="text-center space-y-1.5 border-b border-white/10 pb-4">
-            <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-2">
-              <Lock class="w-6 h-6" />
-            </div>
-            <h2 class="text-lg font-bold text-white">Student Login</h2>
-            <p class="text-xs text-slate-400">Enter your Student ID / Roll No & Password provided by Admin</p>
+          <!-- Logo -->
+          <div class="flex items-center gap-2 mb-5">
+            <img
+              src="/bhavya-logo.svg"
+              alt="BCI Logo"
+              class="w-9 h-9 rounded-xl shadow-sm"
+            />
+            <span class="text-base font-black text-white tracking-tight">BCI</span>
           </div>
 
-          <div id="login-error" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold text-center"></div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">
+            Mark your<br/>Attendance
+          </h2>
 
-          <form id="attend-login-form" class="space-y-4 text-xs">
-            <div>
-              <label for="identifier" class="block text-slate-300 font-semibold mb-1.5">Student ID / Roll No or Email</label>
-              <input
-                type="text"
-                id="identifier"
-                required
-                placeholder="e.g. BCA202601 or student@bhavyacomputerclasses.com"
-                class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium transition"
-              />
+
+          <!-- Info badges -->
+          <div class="space-y-2 w-full">
+            <div class="flex items-center gap-2 text-white/60 text-xs font-semibold">
+              <Monitor class="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Classroom PC / Shared Tablet Portal</span>
             </div>
-
-            <div>
-              <label for="password" class="block text-slate-300 font-semibold mb-1.5">Password</label>
-              <input
-                type="password"
-                id="password"
-                required
-                placeholder="••••••••"
-                class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium transition"
-              />
+            <div class="flex items-center gap-2 text-white/60 text-xs font-semibold">
+              <ShieldCheck class="w-4 h-4 text-brand-400 shrink-0" />
+              <span>Secured with Student ID verification</span>
             </div>
-
-            <button
-              type="submit"
-              id="login-btn"
-              class="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold transition shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 active:scale-95 text-sm"
-            >
-              <span>Verify &amp; Mark Attendance</span>
-              <ArrowRight class="w-4 h-4" />
-            </button>
-          </form>
-        </div>
-
-        <!-- STATE 2: PROCESSING ATTENDANCE -->
-        <div id="processing-step" class={isStudentLoggedIn ? 'space-y-4 py-6 text-center' : 'hidden space-y-4 py-6 text-center'}>
-          <div class="relative w-16 h-16 mx-auto">
-            <div class="w-16 h-16 rounded-full border-4 border-brand-500/20 border-t-brand-500 animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center text-brand-400">
-              <UserCheck class="w-6 h-6" />
-            </div>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-white">Verifying Account &amp; Marking Attendance...</h3>
-            <p class="text-xs text-slate-400 mt-1">Updating Neon Database records in real time</p>
           </div>
         </div>
 
-        <!-- STATE 3: ATTENDANCE RECORD CONFIRMATION CARD -->
-        <div id="result-step" class="hidden space-y-6">
-          <div class="text-center space-y-2">
-            <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto animate-bounce">
-              <CheckCircle2 class="w-8 h-8" />
-            </div>
-            <h2 id="result-title" class="text-xl font-black text-white">Attendance Recorded!</h2>
-            <p id="result-subtitle" class="text-xs text-slate-400">Your presence has been saved to the institutional database.</p>
+        <!-- Vertical divider -->
+        <div class="hidden md:block w-px bg-white/10 my-10 self-stretch"></div>
+
+        <!-- RIGHT PANEL: Form / States -->
+        <div class="flex-1 flex flex-col justify-center p-8 sm:p-12 bg-black">
+
+          <!-- STATE 1: NOT LOGGED IN - LOGIN FORM -->
+          <div id="unauthenticated-step" class={isStudentLoggedIn ? 'hidden' : 'block'}>
+            <h1 class="text-2xl font-black text-white mb-1 leading-snug tracking-tight">
+              Student Login<br/>to mark attendance
+            </h1>
+            <a href="https://www.bhavyacomputerclasses.com/" target="_blank" rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-[11px] text-white hover:text-white/70 transition mb-8 font-medium">
+              bhavyacomputerclasses.com
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+
+            <!-- Error banner -->
+            <div id="login-error" class="hidden mb-4 p-3 rounded-xl bg-rose-950 border border-rose-800 text-rose-400 text-xs font-semibold"></div>
+
+            <form id="attend-login-form" class="space-y-5">
+              <div>
+                <label for="identifier" class="block text-xs font-bold uppercase tracking-wider text-white mb-1.5">Student ID or Email</label>
+                <input
+                  type="text"
+                  id="identifier"
+                  required
+                  placeholder="e.g. BCA202601 or student@bhavyacomputerclasses.com"
+                  class="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white/10 text-xs font-medium transition"
+                />
+              </div>
+
+              <div>
+                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-white mb-1.5">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  required
+                  placeholder="••••••••"
+                  class="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white/10 text-xs font-medium transition"
+                />
+              </div>
+
+              <button
+                type="submit"
+                id="login-btn"
+                class="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] mt-2"
+              >
+                <span id="login-btn-text">Verify &amp; Mark Attendance</span>
+                <ArrowRight class="w-4 h-4" />
+              </button>
+            </form>
           </div>
 
-          <!-- Formatted Attendance Record Card -->
-          <div class="bg-slate-950 rounded-2xl border-2 border-emerald-500/40 p-5 space-y-3 shadow-xl relative overflow-hidden font-mono">
-            <div class="flex items-center justify-between border-b border-white/10 pb-2">
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest font-sans">Attendance Record</span>
-              <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold font-sans">
-                LIVE NEON DB
-              </span>
+          <!-- STATE 2: PROCESSING ATTENDANCE -->
+          <div id="processing-step" class={isStudentLoggedIn ? 'block' : 'hidden'}>
+            <div class="text-center space-y-4 py-6">
+              <div class="relative w-16 h-16 mx-auto">
+                <div class="w-16 h-16 rounded-full border-4 border-brand-500/20 border-t-brand-500 animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-brand-400">
+                  <UserCheck class="w-6 h-6" />
+                </div>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white">Verifying Account &amp; Marking Attendance...</h3>
+                <p class="text-xs text-white/40 mt-1">Updating Neon Database records in real time</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATE 3: ATTENDANCE RECORD CONFIRMATION CARD -->
+          <div id="result-step" class="hidden space-y-6">
+            <div class="text-center space-y-2">
+              <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto animate-bounce">
+                <CheckCircle2 class="w-8 h-8" />
+              </div>
+              <h2 id="result-title" class="text-xl font-black text-white">Attendance Recorded!</h2>
+              <p id="result-subtitle" class="text-xs text-white/40">Your presence has been saved to the institutional database.</p>
             </div>
 
-            <div class="space-y-2 text-xs">
-              <div class="flex items-center justify-between">
-                <span class="text-slate-400">Student:</span>
-                <span id="card-student" class="font-bold text-white">Rahul Kumar</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-slate-400">Student ID:</span>
-                <span id="card-studentid" class="text-slate-300">BCA202601</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-slate-400">Course:</span>
-                <span id="card-course" class="font-bold text-brand-400">BCA</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-slate-400">Date:</span>
-                <span id="card-date" class="text-slate-300">08 Sep 2026</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-slate-400">Time:</span>
-                <span id="card-time" class="text-slate-300">08:17:32 AM</span>
-              </div>
-              <div class="flex items-center justify-between pt-2 border-t border-white/10">
-                <span class="text-slate-400 font-sans font-bold">Status:</span>
-                <span id="card-status" class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-sans">
-                  PRESENT ✓
+            <!-- Attendance Record Card -->
+            <div class="bg-white/5 rounded-2xl border border-white/10 p-5 space-y-3 shadow-xl font-mono">
+              <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                <span class="text-[11px] font-bold text-white/40 uppercase tracking-widest font-sans">Attendance Record</span>
+                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold font-sans">
+                  LIVE NEON DB
                 </span>
               </div>
+
+              <div class="space-y-2 text-xs">
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40">Student:</span>
+                  <span id="card-student" class="font-bold text-white">Rahul Kumar</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40">Student ID:</span>
+                  <span id="card-studentid" class="text-white/70">BCA202601</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40">Course:</span>
+                  <span id="card-course" class="font-bold text-brand-400">BCA</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40">Date:</span>
+                  <span id="card-date" class="text-white/70">08 Sep 2026</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40">Time:</span>
+                  <span id="card-time" class="text-white/70">08:17:32 AM</span>
+                </div>
+                <div class="flex items-center justify-between pt-2 border-t border-white/10">
+                  <span class="text-white/40 font-sans font-bold">Status:</span>
+                  <span id="card-status" class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-sans">
+                    PRESENT ✓
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <a
+                href="/student"
+                class="flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs text-center transition shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2"
+              >
+                <Home class="w-4 h-4" />
+                <span>Student Dashboard</span>
+              </a>
+              <button
+                type="button"
+                onclick="window.location.reload()"
+                class="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-xs transition border border-white/10"
+              >
+                Next Student
+              </button>
             </div>
           </div>
 
-          <div class="flex gap-3">
-            <a
-              href="/student"
-              class="flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs text-center transition shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2"
-            >
-              <Home class="w-4 h-4" />
-              <span>Student Dashboard</span>
-            </a>
-            <button
-              type="button"
-              onclick="window.location.reload()"
-              class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition border border-white/10"
-            >
-              Next Student
-            </button>
-          </div>
         </div>
-
-      </div>
-
-      <div class="text-center text-[11px] text-slate-500">
-        Bhavya Computer Classes • Classroom Direct Terminal • Neon Database
       </div>
 
     </div>
@@ -235,7 +260,8 @@ const isStudentLoggedIn = session && session.role === 'student';
       e.preventDefault();
       errorBox.classList.add('hidden');
       loginBtn.disabled = true;
-      loginBtn.textContent = 'Verifying...';
+      const loginBtnText = document.getElementById('login-btn-text') as HTMLSpanElement;
+      loginBtnText.textContent = 'Verifying...';
 
       try {
         const loginRes = await fetch('/api/auth/login', {
@@ -250,7 +276,7 @@ const isStudentLoggedIn = session && session.role === 'student';
           errorBox.textContent = loginData.error || 'Authentication failed. Check your Student ID and password.';
           errorBox.classList.remove('hidden');
           loginBtn.disabled = false;
-          loginBtn.textContent = 'Verify & Mark Attendance';
+          loginBtnText.textContent = 'Verify & Mark Attendance';
           return;
         }
 
@@ -260,7 +286,7 @@ const isStudentLoggedIn = session && session.role === 'student';
         errorBox.textContent = 'Network connection issue.';
         errorBox.classList.remove('hidden');
         loginBtn.disabled = false;
-        loginBtn.textContent = 'Verify & Mark Attendance';
+        loginBtnText.textContent = 'Verify & Mark Attendance';
       }
     });
 

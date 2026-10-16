@@ -1,10 +1,10 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import { getSessionFromRequest } from '@/lib/auth';
-import { Home, Calendar, Clock, LogOut } from 'lucide-astro';
+import { Home, Clock, LogOut } from 'lucide-astro';
 
 
-const { title = 'Student Portal - Bhavya Computer Classes' } = Astro.props;
+const { title = 'Student Portal - BCI' } = Astro.props;
 const session = getSessionFromRequest(Astro.request);
 if (!session || session.role !== 'student') {
   return Astro.redirect('/login');
@@ -15,19 +15,18 @@ const currentPath = Astro.url.pathname;
 
 <BaseLayout title={title}>
   <!-- Top Responsive Header -->
-  <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/80 py-3 shadow-sm transition-all">
+  <header class="sticky top-0 z-30 bg-white border-b border-slate-200 py-3 shadow-sm transition-all">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-brand-500/25 ring-2 ring-white">
+        <div class="w-9 h-9 rounded-2xl bg-brand-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-brand-600/25">
           {session.name.charAt(0)}
         </div>
         <div>
           <div class="flex items-center gap-1.5">
             <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">{session.name}</h1>
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
           </div>
-          <p class="text-[11px] sm:text-xs text-brand-600 font-semibold flex items-center gap-1">
-            <span>Bhavya Classes</span>
+          <p class="text-[11px] sm:text-xs text-brand-600 font-bold flex items-center gap-1">
+            <span>BCI</span>
             <span class="text-slate-300">•</span>
             <span class="text-slate-500 font-medium">Student</span>
           </p>
@@ -35,35 +34,24 @@ const currentPath = Astro.url.pathname;
       </div>
 
       <!-- Desktop Navigation Bar (Visible on md and larger) -->
-      <nav class="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/60 shadow-inner">
+      <nav class="hidden md:flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200">
         <a
           href="/student"
-          class={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all duration-200 ${
+          class={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all duration-200 ${
             currentPath === '/student' || currentPath === '/student/'
-              ? 'bg-white text-brand-600 shadow-sm'
-              : 'text-slate-600 hover:text-brand-600 hover:bg-white/50'
+              ? 'bg-brand-600 text-white shadow-sm'
+              : 'text-slate-700 hover:text-black hover:bg-white'
           }`}
         >
           <Home class="w-4 h-4" />
           <span>Dashboard</span>
         </a>
         <a
-          href="/student/schedule"
-          class={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all duration-200 ${
-            currentPath.startsWith('/student/schedule')
-              ? 'bg-white text-brand-600 shadow-sm'
-              : 'text-slate-600 hover:text-brand-600 hover:bg-white/50'
-          }`}
-        >
-          <Calendar class="w-4 h-4" />
-          <span>Schedule</span>
-        </a>
-        <a
           href="/student/history"
-          class={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all duration-200 ${
+          class={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all duration-200 ${
             currentPath.startsWith('/student/history')
-              ? 'bg-white text-brand-600 shadow-sm'
-              : 'text-slate-600 hover:text-brand-600 hover:bg-white/50'
+              ? 'bg-brand-600 text-white shadow-sm'
+              : 'text-slate-700 hover:text-black hover:bg-white'
           }`}
         >
           <Clock class="w-4 h-4" />
@@ -73,11 +61,11 @@ const currentPath = Astro.url.pathname;
 
       <button
         id="logout-btn"
-        class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100/80 hover:bg-rose-50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-slate-200/60 transition-all duration-200 active:scale-95"
+        class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-crimson-600 hover:bg-crimson-700 px-3.5 py-2 rounded-xl border border-crimson-700 transition-all duration-200 active:scale-95 shadow-sm shadow-crimson-600/20 cursor-pointer"
         title="Sign Out"
       >
         <LogOut class="w-3.5 h-3.5" />
-        <span class="hidden sm:inline">Sign out</span>
+        <span class="hidden sm:inline">Sign Out</span>
       </button>
     </div>
   </header>
@@ -88,47 +76,29 @@ const currentPath = Astro.url.pathname;
   </main>
 
   <!-- Bottom Touch-Optimized Floating Glass Navigation Bar (Mobile only) -->
-  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-lg border-t border-slate-200/80 shadow-lg md:hidden">
+  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-black text-white border-t border-zinc-800 shadow-xl md:hidden">
     <div class="max-w-md mx-auto flex justify-around items-center h-16 px-3">
       <a
         href="/student"
-        class={`flex flex-col items-center justify-center flex-1 h-full font-semibold text-xs gap-1 transition-all duration-200 ${
+        class={`flex flex-col items-center justify-center flex-1 h-full font-bold text-xs gap-1 transition-all duration-200 ${
           currentPath === '/student' || currentPath === '/student/'
-            ? 'text-brand-600 scale-105'
-            : 'text-slate-500 hover:text-brand-600'
+            ? 'text-brand-400'
+            : 'text-slate-400 hover:text-white'
         }`}
       >
-        <div class={`p-1 rounded-xl transition ${currentPath === '/student' || currentPath === '/student/' ? 'bg-brand-50' : ''}`}>
-          <Home class="w-5 h-5" />
-        </div>
+        <Home class="w-5 h-5" />
         <span class="text-[11px]">Home</span>
       </a>
 
       <a
-        href="/student/schedule"
-        class={`flex flex-col items-center justify-center flex-1 h-full font-semibold text-xs gap-1 transition-all duration-200 ${
-          currentPath.startsWith('/student/schedule')
-            ? 'text-brand-600 scale-105'
-            : 'text-slate-500 hover:text-brand-600'
-        }`}
-      >
-        <div class={`p-1 rounded-xl transition ${currentPath.startsWith('/student/schedule') ? 'bg-brand-50' : ''}`}>
-          <Calendar class="w-5 h-5" />
-        </div>
-        <span class="text-[11px]">Schedule</span>
-      </a>
-
-      <a
         href="/student/history"
-        class={`flex flex-col items-center justify-center flex-1 h-full font-semibold text-xs gap-1 transition-all duration-200 ${
+        class={`flex flex-col items-center justify-center flex-1 h-full font-bold text-xs gap-1 transition-all duration-200 ${
           currentPath.startsWith('/student/history')
-            ? 'text-brand-600 scale-105'
-            : 'text-slate-500 hover:text-brand-600'
+            ? 'text-brand-400'
+            : 'text-slate-400 hover:text-white'
         }`}
       >
-        <div class={`p-1 rounded-xl transition ${currentPath.startsWith('/student/history') ? 'bg-brand-50' : ''}`}>
-          <Clock class="w-5 h-5" />
-        </div>
+        <Clock class="w-5 h-5" />
         <span class="text-[11px]">History</span>
       </a>
     </div>
