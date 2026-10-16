@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { db, schema } from '@/db';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { requireRole } from '@/lib/permissions';
 import { hashPassword } from '@/lib/auth';
 import { createStudentSchema } from '@/lib/validation';
@@ -17,9 +17,10 @@ export const GET: APIRoute = async ({ request }) => {
         userId: schema.users.id,
         name: schema.users.name,
         email: schema.users.email,
-        status: schema.users.status,
+        status: sql<string>`CASE WHEN ${schema.classes.status} = 'inactive' THEN 'inactive' ELSE ${schema.users.status} END`,
         classId: schema.students.classId,
         className: schema.classes.name,
+        classStatus: schema.classes.status,
         createdAt: schema.students.createdAt,
       })
       .from(schema.students)

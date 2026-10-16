@@ -20,7 +20,7 @@ if (!session || session.role !== 'admin') {
 }
 ---
 
-<AdminLayout title="Student Directory - Bhavya Computer Classes">
+<AdminLayout title="Student Directory - Bhavya Career Institute">
   <div class="space-y-6">
     
     <!-- Top Bar Header -->
@@ -114,11 +114,20 @@ if (!session || session.role !== 'admin') {
           <div class="relative">
             <select
               id="batch-filter"
-              class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium"
+              class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium cursor-pointer"
             >
               <option value="all">All Batches</option>
-              <option value="BCA 2A">BCA 2A</option>
-              <option value="PGDCA">PGDCA</option>
+            </select>
+          </div>
+
+          <div class="relative">
+            <select
+              id="status-filter"
+              class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium cursor-pointer"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Deactivated Only</option>
             </select>
           </div>
         </div>
@@ -253,7 +262,7 @@ if (!session || session.role !== 'admin') {
       <!-- Printable QR Badge Blueprint Card -->
       <div id="printable-qr-card" class="bg-white text-slate-900 rounded-3xl p-6 text-center space-y-4 shadow-2xl border-4 border-amber-400">
         <div class="space-y-1">
-          <h4 class="text-xl font-black text-amber-600 tracking-tight">BHAVYA COMPUTER CLASSES</h4>
+          <h4 class="text-xl font-black text-amber-600 tracking-tight">BHAVYA CAREER INSTITUTE</h4>
           <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Permanent Student Attendance QR</p>
         </div>
 
@@ -390,8 +399,13 @@ if (!session || session.role !== 'admin') {
           <td class="p-4 text-slate-500">${s.email}</td>
           <td class="p-4 font-bold text-brand-600">${s.className || '—'}</td>
           <td class="p-4">
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-              ${s.status || 'Active'}
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+              s.status === 'inactive'
+                ? 'bg-slate-200/80 text-slate-700 border border-slate-300'
+                : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+            }">
+              <span class="w-1.5 h-1.5 rounded-full ${s.status === 'inactive' ? 'bg-slate-500' : 'bg-emerald-500'}"></span>
+              <span>${s.status === 'inactive' ? 'Deactivated' : 'Active'}</span>
             </span>
           </td>
           <td class="p-4 text-right">
@@ -417,10 +431,12 @@ if (!session || session.role !== 'admin') {
     // Live search & Filter handling
     const searchInput = document.getElementById('student-search-input') as HTMLInputElement;
     const batchFilter = document.getElementById('batch-filter') as HTMLSelectElement;
+    const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
 
     function applyFilters() {
       const query = searchInput.value.toLowerCase();
       const batch = batchFilter.value;
+      const status = statusFilter?.value || 'all';
 
       const filtered = allStudents.filter((s) => {
         const matchesQuery = s.name.toLowerCase().includes(query) ||
@@ -428,8 +444,9 @@ if (!session || session.role !== 'admin') {
           (s.email && s.email.toLowerCase().includes(query));
 
         const matchesBatch = batch === 'all' || (s.className && s.className === batch);
+        const matchesStatus = status === 'all' || s.status === status;
 
-        return matchesQuery && matchesBatch;
+        return matchesQuery && matchesBatch && matchesStatus;
       });
 
       renderStudents(filtered);
@@ -437,6 +454,7 @@ if (!session || session.role !== 'admin') {
 
     searchInput?.addEventListener('input', applyFilters);
     batchFilter?.addEventListener('change', applyFilters);
+    statusFilter?.addEventListener('change', applyFilters);
 
     // Modal controls
     const modal = document.getElementById('student-modal')!;

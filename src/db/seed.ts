@@ -3,7 +3,7 @@ import { db } from './index';
 import * as schema from './schema';
 
 export async function runSeed() {
-  console.log('🌱 Seeding Bhavya Computer Classes Attendance System...');
+  console.log('🌱 Seeding Bhavya Career Institute Attendance System...');
 
   const adminPassword = await hashPassword('AdminPass123!');
   const teacherPassword = await hashPassword('TeacherPass123!');
@@ -95,7 +95,7 @@ export async function runSeed() {
     };
     await db.insert(schema.attendanceSessions).values(sessionData).onConflictDoNothing();
 
-    console.log('✅ Bhavya Computer Classes Database seeded successfully with RSCIT Course!');
+    console.log('✅ Bhavya Career Institute Database seeded successfully with RSCIT Course!');
   } catch (error) {
     console.error('Error seeding database:', error);
   }

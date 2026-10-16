@@ -6,6 +6,7 @@ import {
   GraduationCap,
   BarChart3,
   QrCode,
+  Layers,
   LogOut,
   Menu,
   X,
@@ -21,7 +22,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <BaseLayout title={title}>
-  <div class="min-h-screen flex flex-col md:flex-row bg-slate-100/90 text-slate-900 relative">
+  <div class="min-h-screen md:h-screen md:overflow-hidden flex flex-col md:flex-row bg-slate-100/90 text-slate-900 relative">
     
     <!-- Mobile Top Navigation Header -->
     <header class="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -51,7 +52,7 @@ const currentPath = Astro.url.pathname;
     <!-- Sidebar Navigation -->
     <aside
       id="admin-sidebar"
-      class="fixed inset-y-0 left-0 z-50 w-72 md:w-64 bg-black text-white flex-shrink-0 border-r border-zinc-800 flex flex-col justify-between transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none"
+      class="fixed inset-y-0 left-0 z-50 w-72 md:w-64 bg-black text-white flex-shrink-0 border-r border-zinc-800 flex flex-col justify-between transform -translate-x-full md:translate-x-0 md:static md:h-screen md:overflow-y-auto transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none"
     >
       <div>
         <!-- Brand Header (Desktop) -->
@@ -111,6 +112,18 @@ const currentPath = Astro.url.pathname;
           </a>
 
           <a
+            href="/admin/batches"
+            class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
+              currentPath.startsWith('/admin/batches')
+                ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30'
+                : 'text-slate-300 hover:text-white hover:bg-zinc-900'
+            }`}
+          >
+            <Layers class={`w-4 h-4 ${currentPath.startsWith('/admin/batches') ? 'text-white' : 'text-slate-400'}`} />
+            <span>Batch Management</span>
+          </a>
+
+          <a
             href="/admin/reports"
             class={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition ${
               currentPath.startsWith('/admin/reports')
@@ -149,7 +162,7 @@ const currentPath = Astro.url.pathname;
     </aside>
 
     <!-- Main Admin Content Area -->
-    <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-slate-50 text-slate-900 min-h-[calc(100vh-57px)] md:min-h-screen">
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-slate-50 text-slate-900 min-h-[calc(100vh-57px)] md:h-screen">
       <slot />
     </main>
   </div>

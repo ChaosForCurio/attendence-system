@@ -16,7 +16,7 @@ if (!session || session.role !== 'admin') {
 }
 ---
 
-<AdminLayout title="Attendance Reports - Bhavya Computer Classes">
+<AdminLayout title="Attendance Reports - Bhavya Career Institute">
   <div class="space-y-6">
     
     <!-- Top Bar Header -->
@@ -269,11 +269,7 @@ if (!session || session.role !== 'admin') {
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text('Bhavya Computer Classes', margin, 10);
-
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Attendance Management System', margin, 16);
+        doc.text('Bhavya Career Institute', margin, 13.5);
 
         // Report title (right-aligned)
         doc.setFontSize(11);
@@ -422,7 +418,7 @@ if (!session || session.role !== 'admin') {
             doc.setTextColor(148, 163, 184);    // slate-400
 
             // Left footer
-            doc.text('Bhavya Computer Classes — Confidential', margin, pageH - 6);
+            doc.text('Bhavya Career Institute — Confidential', margin, pageH - 6);
             // Right footer: page number
             doc.text(
               `Page ${hookData.pageNumber} of ${pageCount}`,

@@ -6,7 +6,6 @@ import {
   UserCheck,
   UserX,
   TrendingUp,
-  Download,
   BarChart3,
   QrCode,
   ArrowRight,
@@ -20,7 +19,7 @@ if (!session || session.role !== 'admin') {
 }
 ---
 
-<AdminLayout title="Dashboard Overview - Bhavya Computer Classes">
+<AdminLayout title="Dashboard Overview - Bhavya Career Institute">
   <div class="space-y-8">
     
     <!-- Top Bar Header -->
@@ -43,13 +42,6 @@ if (!session || session.role !== 'admin') {
         >
           <QrCode class="w-4 h-4" />
           <span>Attendance QR Center</span>
-        </a>
-        <a
-          href="/admin/reports"
-          class="inline-flex items-center gap-2 bg-crimson-600 hover:bg-crimson-700 active:bg-crimson-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-crimson-600/25 transition active:scale-95 cursor-pointer"
-        >
-          <Download class="w-4 h-4" />
-          <span>Export PDF Report</span>
         </a>
       </div>
     </div>
@@ -246,7 +238,11 @@ if (!session || session.role !== 'admin') {
                     <span class="text-slate-500 text-[11px] font-medium">${c.description || 'Active Batch'}</span>
                   </div>
                 </div>
-                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Active</span>
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                  c.status === 'active'
+                    ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                    : 'bg-slate-200 text-slate-600 border border-slate-300'
+                }">${c.status === 'active' ? 'Active' : 'Deactivated'}</span>
               </div>
             `).join('');
           } else {

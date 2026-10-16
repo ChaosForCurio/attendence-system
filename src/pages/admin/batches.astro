@@ -1,0 +1,609 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { getSessionFromRequest } from '@/lib/auth';
+import {
+  Layers,
+  Plus,
+  Search,
+  Users,
+  CheckCircle2,
+  XCircle,
+  Power,
+  Edit2,
+  Trash2,
+  Calendar,
+  GraduationCap,
+  ArrowRight,
+  Sparkles,
+  Info,
+} from 'lucide-astro';
+
+const session = getSessionFromRequest(Astro.request);
+if (!session || session.role !== 'admin') {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout title="Batch Management - Bhavya Career Institute">
+  <div class="space-y-6">
+    
+    <!-- Top Bar Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Batch Management</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-200/80">
+            Academic Programs
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1 font-medium">Manage course batches, toggle active/inactive program statuses, and track enrollments</p>
+      </div>
+
+      <button
+        id="open-create-batch-modal"
+        class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-brand-600/20 transition active:scale-95 whitespace-nowrap cursor-pointer"
+      >
+        <Plus class="w-4 h-4" />
+        <span>Create New Batch</span>
+      </button>
+    </div>
+
+    <!-- Overview Stats Bar -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Batches</span>
+          <span id="stat-total-batches" class="text-2xl font-black text-slate-900">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-brand-50 text-brand-600">
+          <Layers class="w-5 h-5" />
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Active Batches</span>
+          <span id="stat-active-batches" class="text-2xl font-black text-emerald-600">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+          <CheckCircle2 class="w-5 h-5" />
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Deactivated Batches</span>
+          <span id="stat-inactive-batches" class="text-2xl font-black text-slate-500">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-100 text-slate-600">
+          <XCircle class="w-5 h-5" />
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm">
+        <div>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Students</span>
+          <span id="stat-total-enrolled" class="text-2xl font-black text-indigo-600">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+          <GraduationCap class="w-5 h-5" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="relative flex-1">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <Search class="w-4 h-4" />
+          </div>
+          <input
+            type="text"
+            id="batch-search-input"
+            placeholder="Search by batch name, section, or academic year..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select
+            id="batch-status-filter"
+            class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium cursor-pointer"
+          >
+            <option value="all">All Batches</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Deactivated Only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Batch Cards Grid Container -->
+      <div id="batches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+        <div class="col-span-full py-12 text-center text-slate-400 font-medium text-xs">
+          Loading batches...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Create New Batch Modal -->
+  <div id="create-batch-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200/80 rounded-3xl p-6 max-w-md w-full text-slate-900 space-y-4 shadow-2xl relative">
+      <button id="close-create-batch-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold p-1 cursor-pointer">✕</button>
+      
+      <div>
+        <h3 class="text-lg font-bold">Create New Batch</h3>
+        <p class="text-xs text-slate-500 font-medium">Add a new class program or time-slot batch</p>
+      </div>
+
+      <form id="create-batch-form" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Batch / Course Program Name</label>
+          <input
+            type="text"
+            id="batch-name-input"
+            required
+            placeholder="e.g. RSCIT May 2026 or Tally Prime Batch"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium"
+          />
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Section / Shift Details</label>
+          <input
+            type="text"
+            id="batch-section-input"
+            required
+            placeholder="e.g. Batch A - Morning (09:00 AM)"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Academic Year</label>
+            <input
+              type="text"
+              id="batch-academic-year-input"
+              required
+              value="2026-2027"
+              placeholder="e.g. 2026-2027"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium"
+            />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Level / Year Number</label>
+            <input
+              type="number"
+              id="batch-year-input"
+              min="1"
+              max="5"
+              value="1"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium"
+            />
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            id="cancel-create-batch-btn"
+            class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="submit-create-batch-btn"
+            class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold shadow-md shadow-brand-600/20 cursor-pointer"
+          >
+            Save Batch
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Batch Modal -->
+  <div id="edit-batch-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200/80 rounded-3xl p-6 max-w-md w-full text-slate-900 space-y-4 shadow-2xl relative">
+      <button id="close-edit-batch-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold p-1 cursor-pointer">✕</button>
+      
+      <div>
+        <h3 class="text-lg font-bold">Edit Batch Details</h3>
+        <p class="text-xs text-slate-500 font-medium">Update batch name, timing section, or academic year</p>
+      </div>
+
+      <form id="edit-batch-form" class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-batch-id" />
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Batch / Program Name</label>
+          <input
+            type="text"
+            id="edit-batch-name"
+            required
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium"
+          />
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Section / Shift Details</label>
+          <input
+            type="text"
+            id="edit-batch-section"
+            required
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Academic Year</label>
+            <input
+              type="text"
+              id="edit-batch-academic-year"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium"
+            />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Status</label>
+            <select
+              id="edit-batch-status"
+              class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium cursor-pointer"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            id="cancel-edit-batch-btn"
+            class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="submit-edit-batch-btn"
+            class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold shadow-md shadow-brand-600/20 cursor-pointer"
+          >
+            Update Batch
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let allBatches: any[] = [];
+
+    async function fetchBatches() {
+      try {
+        const res = await fetch('/api/admin/classes');
+        if (!res.ok) throw new Error('Failed to fetch batches');
+        const data = await res.json();
+        allBatches = data.classes || [];
+        updateStats();
+        renderBatches();
+      } catch (err: any) {
+        console.error('Fetch batches error:', err);
+        const grid = document.getElementById('batches-grid')!;
+        grid.innerHTML = `
+          <div class="col-span-full py-8 text-center text-rose-500 font-medium text-xs">
+            Failed to load batches: ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    function updateStats() {
+      const total = allBatches.length;
+      const active = allBatches.filter(b => b.status === 'active').length;
+      const inactive = total - active;
+      const enrolled = allBatches.reduce((acc, b) => acc + (b.studentCount || 0), 0);
+
+      document.getElementById('stat-total-batches')!.textContent = total.toString();
+      document.getElementById('stat-active-batches')!.textContent = active.toString();
+      document.getElementById('stat-inactive-batches')!.textContent = inactive.toString();
+      document.getElementById('stat-total-enrolled')!.textContent = enrolled.toString();
+    }
+
+    function renderBatches() {
+      const query = (document.getElementById('batch-search-input') as HTMLInputElement)?.value.toLowerCase() || '';
+      const filter = (document.getElementById('batch-status-filter') as HTMLSelectElement)?.value || 'all';
+
+      const filtered = allBatches.filter(b => {
+        const matchesQuery = (
+          (b.name && b.name.toLowerCase().includes(query)) ||
+          (b.section && b.section.toLowerCase().includes(query)) ||
+          (b.academicYear && b.academicYear.toLowerCase().includes(query))
+        );
+
+        if (!matchesQuery) return false;
+        if (filter === 'active') return b.status === 'active';
+        if (filter === 'inactive') return b.status === 'inactive';
+        return true;
+      });
+
+      const grid = document.getElementById('batches-grid')!;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 font-medium text-xs space-y-2">
+            <p>No batches match your search criteria.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(b => {
+        const isActive = b.status === 'active';
+        const studentCount = b.studentCount || 0;
+
+        return `
+          <div class="bg-white rounded-3xl p-5 border ${isActive ? 'border-slate-200/90 shadow-sm' : 'border-slate-200/60 bg-slate-50/70 opacity-80'} transition-all duration-200 flex flex-col justify-between space-y-4">
+            
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-sm text-slate-900">${escapeHtml(b.name)}</h3>
+                  </div>
+                  <p class="text-xs text-slate-500 font-medium mt-0.5">${escapeHtml(b.section || 'General Section')}</p>
+                </div>
+
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                  isActive
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-slate-200/80 text-slate-600 border border-slate-300'
+                }">
+                  <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+                  <span>${isActive ? 'Active' : 'Deactivated'}</span>
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Academic Year</span>
+                  <span class="font-bold text-slate-700">${escapeHtml(b.academicYear || '2026-2027')}</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Enrolled</span>
+                  <span class="font-bold ${studentCount > 0 ? 'text-brand-600' : 'text-slate-500'}">
+                    ${studentCount} Students
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  data-action="edit"
+                  data-id="${b.id}"
+                  class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                  title="Edit Batch"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                  <span>Edit</span>
+                </button>
+
+                ${
+                  studentCount === 0
+                    ? `<button
+                        type="button"
+                        data-action="delete"
+                        data-id="${b.id}"
+                        class="px-2.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                        title="Delete Batch"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                      </button>`
+                    : ''
+                }
+              </div>
+
+              <!-- Toggle Active / Deactivate Button -->
+              <button
+                type="button"
+                data-action="toggle-status"
+                data-id="${b.id}"
+                data-current-status="${b.status}"
+                class="px-3 py-1.5 rounded-xl font-bold text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
+                  isActive
+                    ? 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200'
+                    : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'
+                }"
+              >
+                <span>${isActive ? 'Deactivate' : 'Activate'}</span>
+              </button>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+
+      // Bind dynamic actions
+      grid.querySelectorAll('button[data-action="toggle-status"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id')!;
+          const currentStatus = btn.getAttribute('data-current-status')!;
+          const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+          toggleBatchStatus(id, newStatus);
+        });
+      });
+
+      grid.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id')!;
+          openEditModal(id);
+        });
+      });
+
+      grid.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id')!;
+          deleteBatch(id);
+        });
+      });
+    }
+
+    function escapeHtml(str: string): string {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function toggleBatchStatus(id: string, newStatus: 'active' | 'inactive') {
+      try {
+        const res = await fetch('/api/admin/classes', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, status: newStatus }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update batch status');
+
+        (window as any).showToast?.(data.message || `Batch ${newStatus === 'active' ? 'activated' : 'deactivated'}`, 'success');
+        await fetchBatches();
+      } catch (err: any) {
+        (window as any).showToast?.(err.message, 'error');
+      }
+    }
+
+    async function deleteBatch(id: string) {
+      if (!confirm('Are you sure you want to delete this batch? This action cannot be undone.')) return;
+
+      try {
+        const res = await fetch(`/api/admin/classes?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete batch');
+
+        (window as any).showToast?.('Batch deleted successfully', 'success');
+        await fetchBatches();
+      } catch (err: any) {
+        (window as any).showToast?.(err.message, 'error');
+      }
+    }
+
+    // Modal controls: Create Batch
+    const createModal = document.getElementById('create-batch-modal')!;
+    const openCreateBtn = document.getElementById('open-create-batch-modal')!;
+    const closeCreateBtn = document.getElementById('close-create-batch-modal')!;
+    const cancelCreateBtn = document.getElementById('cancel-create-batch-btn')!;
+    const createForm = document.getElementById('create-batch-form') as HTMLFormElement;
+
+    function showCreateModal() {
+      createForm.reset();
+      createModal.classList.remove('hidden');
+    }
+
+    function hideCreateModal() {
+      createModal.classList.add('hidden');
+    }
+
+    openCreateBtn.addEventListener('click', showCreateModal);
+    closeCreateBtn.addEventListener('click', hideCreateModal);
+    cancelCreateBtn.addEventListener('click', hideCreateModal);
+
+    createForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('batch-name-input') as HTMLInputElement).value.trim();
+      const section = (document.getElementById('batch-section-input') as HTMLInputElement).value.trim();
+      const academicYear = (document.getElementById('batch-academic-year-input') as HTMLInputElement).value.trim();
+      const year = parseInt((document.getElementById('batch-year-input') as HTMLInputElement).value || '1', 10);
+
+      try {
+        const res = await fetch('/api/admin/classes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, section, academicYear, year }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create batch');
+
+        (window as any).showToast?.('Batch created successfully!', 'success');
+        hideCreateModal();
+        await fetchBatches();
+      } catch (err: any) {
+        (window as any).showToast?.(err.message, 'error');
+      }
+    });
+
+    // Modal controls: Edit Batch
+    const editModal = document.getElementById('edit-batch-modal')!;
+    const closeEditBtn = document.getElementById('close-edit-batch-modal')!;
+    const cancelEditBtn = document.getElementById('cancel-edit-batch-btn')!;
+    const editForm = document.getElementById('edit-batch-form') as HTMLFormElement;
+
+    function openEditModal(id: string) {
+      const batch = allBatches.find(b => b.id === id);
+      if (!batch) return;
+
+      (document.getElementById('edit-batch-id') as HTMLInputElement).value = batch.id;
+      (document.getElementById('edit-batch-name') as HTMLInputElement).value = batch.name || '';
+      (document.getElementById('edit-batch-section') as HTMLInputElement).value = batch.section || '';
+      (document.getElementById('edit-batch-academic-year') as HTMLInputElement).value = batch.academicYear || '2026-2027';
+      (document.getElementById('edit-batch-status') as HTMLSelectElement).value = batch.status || 'active';
+
+      editModal.classList.remove('hidden');
+    }
+
+    function hideEditModal() {
+      editModal.classList.add('hidden');
+    }
+
+    closeEditBtn.addEventListener('click', hideEditModal);
+    cancelEditBtn.addEventListener('click', hideEditModal);
+
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = (document.getElementById('edit-batch-id') as HTMLInputElement).value;
+      const name = (document.getElementById('edit-batch-name') as HTMLInputElement).value.trim();
+      const section = (document.getElementById('edit-batch-section') as HTMLInputElement).value.trim();
+      const academicYear = (document.getElementById('edit-batch-academic-year') as HTMLInputElement).value.trim();
+      const status = (document.getElementById('edit-batch-status') as HTMLSelectElement).value;
+
+      try {
+        const res = await fetch('/api/admin/classes', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, section, academicYear, status }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update batch');
+
+        (window as any).showToast?.('Batch updated successfully!', 'success');
+        hideEditModal();
+        await fetchBatches();
+      } catch (err: any) {
+        (window as any).showToast?.(err.message, 'error');
+      }
+    });
+
+    // Search and filter listeners
+    document.getElementById('batch-search-input')?.addEventListener('input', renderBatches);
+    document.getElementById('batch-status-filter')?.addEventListener('change', renderBatches);
+
+    // Initial load
+    fetchBatches();
+  </script>
+</AdminLayout>

@@ -1,7 +1,7 @@
 {
-  "name": "Bhavya Computer Classes",
-  "short_name": "Bhavya Class",
-  "description": "Fast 1-Tap Student Attendance System for Bhavya Computer Classes",
+  "name": "Bhavya Career Institute",
+  "short_name": "BCI",
+  "description": "Fast 1-Tap Student Attendance System for Bhavya Career Institute",
   "start_url": "/student",
   "display": "standalone",
   "background_color": "#4f46e5",

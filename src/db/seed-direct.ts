@@ -10,7 +10,7 @@ const connectionString = 'postgresql://neondb_owner:npg_QmhFlg5TB0Sj@ep-autumn-p
 const sql = neon(connectionString);
 
 async function directSeed() {
-  console.log('🌱 Executing direct Neon Database Seed for Bhavya Computer Classes...');
+  console.log('🌱 Executing direct Neon Database Seed for Bhavya Career Institute...');
 
   const adminPassword = await hashPassword('AdminPass123!');
   const teacherPassword = await hashPassword('TeacherPass123!');
@@ -102,7 +102,7 @@ async function directSeed() {
       ON CONFLICT (id) DO NOTHING;
     `;
 
-    console.log('✅ Bhavya Computer Classes Database seeded successfully with RSCIT Course and Batches on Neon!');
+    console.log('✅ Bhavya Career Institute Database seeded successfully with RSCIT Course and Batches on Neon!');
   } catch (err) {
     console.error('Seed error:', err);
   }
